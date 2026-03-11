@@ -1,10 +1,10 @@
-package seedu.duke;
+package seedu.pharmatracker;
 
 import java.util.Scanner;
 
-public class Duke {
+public class PharmaTracker {
     /**
-     * Main entry-point for the java.duke.Duke application.
+     * Main entry-point for the PharmaTracker application.
      */
     public static void main(String[] args) {
         String logo = " ____        _        \n"
