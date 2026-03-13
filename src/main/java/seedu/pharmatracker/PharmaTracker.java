@@ -1,7 +1,5 @@
 package seedu.pharmatracker;
 
-import java.util.Scanner;
-
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.parser.Parser;
 import seedu.pharmatracker.ui.Ui;
