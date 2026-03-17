@@ -1,5 +1,8 @@
 package seedu.pharmatracker.data;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class Medication {
@@ -113,12 +116,34 @@ public class Medication {
         this.warnings.add(warning);
     }
 
+    /**
+     * Checks if the medication has expired as of today.
+     * 
+     * @return true if the expiry date is before today, false otherwise
+     */
+    public boolean isExpired() {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate expiry = LocalDate.parse(this.expiryDate, formatter);
+            LocalDate today = LocalDate.now();
+            return expiry.isBefore(today);
+        } catch (DateTimeParseException e) {
+            // If date cannot be parsed, treat as not expired
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         String s = "Name: " + name +
                    " | Dosage: " + dosage +
                    " | Qty: " + quantity +
                    " | Exp: " + expiryDate;
+
+        // Add expired tag if medication is expired
+        if (isExpired()) {
+            s += " | [EXPIRED]";
+        }
 
         if (!tag.isEmpty()) {
             s += " | Tag: " + tag;
