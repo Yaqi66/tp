@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
@@ -27,7 +27,7 @@ public class SortCommandTest {
      * Sets up test fixtures before each test method.
      * Initializes the SortCommand, inventory, and captures system output.
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         sortCommand = new SortCommand();
         inventory = new Inventory();
@@ -53,7 +53,7 @@ public class SortCommandTest {
      */
     @Test
     public void execute_singleMedication_displaysSingleItem() {
-        Medication medication = new Medication("Aspirin", "2026-12-31", 10);
+        Medication medication = new Medication("Aspirin", "500mg", 10, "2026-12-31", "painkiller");
         inventory.addMedication(medication);
 
         sortCommand.execute(inventory);
@@ -70,9 +70,9 @@ public class SortCommandTest {
     @Test
     public void execute_multipleMedications_sortsByExpiryDateAscending() {
         // Add medications with different expiry dates in random order
-        Medication medication1 = new Medication("Aspirin", "2026-03-20", 10);
-        Medication medication2 = new Medication("Paracetamol", "2026-01-15", 20);
-        Medication medication3 = new Medication("Ibuprofen", "2026-06-10", 15);
+        Medication medication1 = new Medication("Aspirin", "500mg", 10, "2026-03-20", "painkiller");
+        Medication medication2 = new Medication("Paracetamol", "500mg", 20, "2026-01-15", "painkiller");
+        Medication medication3 = new Medication("Ibuprofen", "200mg", 15, "2026-06-10", "painkiller");
 
         inventory.addMedication(medication1);
         inventory.addMedication(medication2);
@@ -100,8 +100,8 @@ public class SortCommandTest {
      */
     @Test
     public void execute_invalidExpiryDates_treatsAsMaximumDate() {
-        Medication validMedication = new Medication("ValidMed", "2026-03-20", 10);
-        Medication invalidMedication = new Medication("InvalidMed", "invalid-date", 5);
+        Medication validMedication = new Medication("ValidMed", "100mg", 10, "2026-03-20", "general");
+        Medication invalidMedication = new Medication("InvalidMed", "50mg", 5, "invalid-date", "general");
 
         inventory.addMedication(invalidMedication);
         inventory.addMedication(validMedication);
@@ -129,8 +129,8 @@ public class SortCommandTest {
      */
     @Test
     public void execute_multipleMedications_displaysCorrectFormat() {
-        Medication medication1 = new Medication("Aspirin", "2026-03-20", 10);
-        Medication medication2 = new Medication("Paracetamol", "2026-01-15", 20);
+        Medication medication1 = new Medication("Aspirin", "500mg", 10, "2026-03-20", "painkiller");
+        Medication medication2 = new Medication("Paracetamol", "500mg", 20, "2026-01-15", "painkiller");
 
         inventory.addMedication(medication1);
         inventory.addMedication(medication2);
