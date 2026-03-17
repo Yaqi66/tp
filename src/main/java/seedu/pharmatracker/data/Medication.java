@@ -149,6 +149,30 @@ public class Medication {
             s += " | Tag: " + tag;
         }
 
+        if (!dosageForm.isEmpty()) {
+            s += " | Dosage Form: " + dosageForm;
+        }
+
+        if (!manufacturer.isEmpty()) {
+            s += " | Manufacturer: " + manufacturer;
+        }
+
+        if (!directions.isEmpty()) {
+            s += " | Directions: " + directions;
+        }
+
+        if (!frequency.isEmpty()) {
+            s += " | Frequency: " + frequency;
+        }
+
+        if (!route.isEmpty()) {
+            s += " | Route: " + route;
+        }
+
+        if (!maxDailyDose.isEmpty()) {
+            s += " | Maximum Daily Dosage: " + maxDailyDose;
+        }
+
         return s;
     }
 }
