@@ -10,7 +10,6 @@ import seedu.pharmatracker.command.SortCommand;
 import seedu.pharmatracker.command.FindCommand;
 import seedu.pharmatracker.command.ViewCommand;
 import seedu.pharmatracker.command.DispenseCommand;
-import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.exceptions.PharmaTrackerException;
 
 public class Parser {
