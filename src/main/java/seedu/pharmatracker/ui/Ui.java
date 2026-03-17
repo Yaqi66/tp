@@ -16,9 +16,9 @@ public class Ui {
     private static final String DIVIDER = "____________________________________________________________";
     private static final String DETAIL_DIVIDER = "----------------------------------------";
     private static final String DETAIL_BORDER = "========================================";
-    public static final String MESSAGE_ADDED = "You have added the following medication:";
-    public static final String INDENT = "  ";
-    public static final String MESSAGE_DELETED = "You have deleted the following medication:";
+    private static final String MESSAGE_ADDED = "You have added the following medication:";
+    private static final String INDENT = "  ";
+    private static final String MESSAGE_DELETED = "You have deleted the following medication:";
 
     private final Scanner in;
 
