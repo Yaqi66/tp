@@ -4,14 +4,30 @@ import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 import seedu.pharmatracker.ui.Ui;
 
+/**
+ * Represents a command to delete a specific medication from the inventory.
+ * The medication to be deleted is identified by its 1-based index as shown in the inventory list.
+ */
 public class DeleteCommand extends Command {
 
     private final String description;
 
+    /**
+     * Constructs an DeleteCommand with the specified target index description.
+     *
+     * @param description The 1-based index of the medication to be deleted, provided as a String.
+     */
     public DeleteCommand(String description) {
         this.description = description;
     }
 
+    /**
+     * Executes the delete command by parsing the target index, locating the corresponding
+     * {@link Medication} in the {@link Inventory}, removing it, and displaying a confirmation message.
+     *
+     * @param inventory The current inventory containing all stored medications.
+     * @param ui        The user interface used to display messages and interact with the user.
+     */
     @Override
     public void execute(Inventory inventory, Ui ui) {
         int index = Integer.parseInt(description);
