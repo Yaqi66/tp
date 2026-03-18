@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class StorageTest {
-    private Storage storage;
     private static final String TEST_FILE_PATH = "data/pharmatracker.txt";
+    private Storage storage;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,7 @@ public class StorageTest {
     }
 
     @Test
-    void save_andLoad_singleMedication_success() {
+    void save_singleMedication_success() {
         Inventory inventory = new Inventory();
         inventory.addMedication(new Medication("Paracetamol", "500mg", 50, "2026-12-31", "painkiller"));
 
@@ -49,7 +49,7 @@ public class StorageTest {
     }
 
     @Test
-    void save_andLoad_multipleMedications_success() {
+    void save_multipleMedications_success() {
         Inventory inventory = new Inventory();
         inventory.addMedication(new Medication("Paracetamol", "500mg", 50, "2026-12-31", "painkiller"));
         inventory.addMedication(new Medication("Ibuprofen", "200mg", 30, "2027-06-15", "anti-inflammatory"));
@@ -64,7 +64,7 @@ public class StorageTest {
     }
 
     @Test
-    void save_emptyInventory_loadsEmptyInventory() {
+    void save_emptyInventory_loadsEmpty() {
         Inventory inventory = new Inventory();
         storage.save(inventory);
 
