@@ -5,13 +5,20 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+/**
+ * Represents a medication stored in the inventory.
+ * Contains both compulsory attributes (name, dosage, quantity, expiry date)
+ * and various optional attributes for detailed tracking.
+ */
 public class Medication {
+    // Compulsory attributes for a Medication.
     private String name;
     private String dosage;
     private int quantity;
     private String expiryDate;
-    private String tag;
 
+    // Optional attributes for a Medication.
+    private String tag;
     private String dosageForm;
     private String manufacturer;
     private String directions;
@@ -20,6 +27,17 @@ public class Medication {
     private String maxDailyDose;
     private ArrayList<String> warnings;
 
+    /**
+     * Constructs a {@code Medication} with the specified mandatory details.
+     * All optional string attributes are initialized to empty strings, and the
+     * warnings list is initialized as an empty ArrayList.
+     *
+     * @param name       The name of the medication.
+     * @param dosage     The strength or dosage of the medication.
+     * @param quantity   The number of units in stock.
+     * @param expiryDate The expiration date in YYYY-MM-DD format.
+     * @param tag        The category or tag associated with the medication.
+     */
     public Medication(String name, String dosage, int quantity, String expiryDate, String tag) {
         this.name = name;
         this.dosage = dosage;
@@ -112,6 +130,11 @@ public class Medication {
         return this.warnings;
     }
 
+    /**
+     * Adds a warning string to the medication's list of warnings.
+     *
+     * @param warning The warning or precaution to be added.
+     */
     public void addWarning(String warning) {
         this.warnings.add(warning);
     }
@@ -122,17 +145,33 @@ public class Medication {
      * @return true if the expiry date is before today, false otherwise
      */
     public boolean isExpired() {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate expiry = LocalDate.parse(this.expiryDate, formatter);
-            LocalDate today = LocalDate.now();
-            return expiry.isBefore(today);
-        } catch (DateTimeParseException e) {
-            // If date cannot be parsed, treat as not expired
+        String expiry = this.expiryDate;
+        if (expiry == null) {
             return false;
         }
+        expiry = expiry.trim();
+        LocalDate expiryDateParsed = null;
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        try {
+            expiryDateParsed = LocalDate.parse(expiry, formatter1);
+        } catch (DateTimeParseException e1) {
+            try {
+                expiryDateParsed = LocalDate.parse(expiry, formatter2);
+            } catch (DateTimeParseException e2) {
+                return false;
+            }
+        }
+        LocalDate today = LocalDate.now();
+        return expiryDateParsed.isBefore(today);
     }
 
+    /**
+     * Returns a formatted string representation of the medication.
+     * Includes all populated fields and appends an "[EXPIRED]" tag if the medication has expired.
+     *
+     * @return A string containing the medication's details
+     */
     @Override
     public String toString() {
         String s = "Name: " + name +

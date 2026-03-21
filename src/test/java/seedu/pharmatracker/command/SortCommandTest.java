@@ -8,6 +8,9 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
@@ -47,7 +50,7 @@ public class SortCommandTest {
     public void execute_emptyInventory_displaysEmptyMessage() {
         sortCommand.execute(inventory, ui);
         String output = outputStream.toString();
-        assert output.contains("Inventory is empty.") : "Output should contain empty inventory message";
+        assertTrue(output.contains("Inventory is empty."), "Output should contain empty inventory message");
     }
 
     /**
@@ -62,8 +65,8 @@ public class SortCommandTest {
         sortCommand.execute(inventory, ui);
         String output = outputStream.toString();
 
-        assert output.contains("Medications sorted by expiry date:") : "Output should contain sort header";
-        assert output.contains("1. ") : "Output should contain medication at index 1";
+        assertTrue(output.contains("Medications sorted by expiry date:"), "Output should contain sort header");
+        assertTrue(output.contains("1. "), "Output should contain medication at index 1");
     }
 
     /**
@@ -82,7 +85,7 @@ public class SortCommandTest {
         inventory.addMedication(medication3);
 
         ArrayList<Medication> medicationsBeforeSort = inventory.getMedications();
-        assert medicationsBeforeSort.size() == 3 : "Inventory should contain 3 medications";
+        assertEquals(3, medicationsBeforeSort.size(), "Inventory should contain 3 medications");
 
         sortCommand.execute(inventory, ui);
 
@@ -92,8 +95,8 @@ public class SortCommandTest {
         LocalDate date2 = LocalDate.parse(medicationsAfterSort.get(1).getExpiryDate(), formatter);
         LocalDate date3 = LocalDate.parse(medicationsAfterSort.get(2).getExpiryDate(), formatter);
 
-        assert date1.compareTo(date2) <= 0 : "First medication should expire before or same as second";
-        assert date2.compareTo(date3) <= 0 : "Second medication should expire before or same as third";
+        assertTrue(date1.compareTo(date2) <= 0, "First medication should expire before or same as second");
+        assertTrue(date2.compareTo(date3) <= 0, "Second medication should expire before or same as third");
     }
 
     /**
@@ -112,17 +115,17 @@ public class SortCommandTest {
         sortCommand.execute(inventory, ui);
 
         ArrayList<Medication> medicationsAfterSort = inventory.getMedications();
-        assert medicationsAfterSort.size() == 2 : "Inventory should still contain 2 medications";
+        assertEquals(2, medicationsAfterSort.size(), "Inventory should still contain 2 medications");
 
         // The valid medication should be first (earlier date)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
             LocalDate firstDate = LocalDate.parse(
                     medicationsAfterSort.get(0).getExpiryDate(), formatter);
-            assert firstDate.equals(LocalDate.parse("2026-03-20", formatter))
-                    : "First medication should be the valid one";
+            assertEquals(LocalDate.parse("2026-03-20", formatter), firstDate,
+                    "First medication should be the valid one");
         } catch (Exception e) {
-            assert false : "First medication should have valid expiry date";
+            fail("First medication should have valid expiry date");
         }
     }
 
@@ -141,8 +144,8 @@ public class SortCommandTest {
         sortCommand.execute(inventory, ui);
         String output = outputStream.toString();
 
-        assert output.contains("Medications sorted by expiry date:") : "Output should contain header";
-        assert output.contains("1. ") : "Output should display first medication";
-        assert output.contains("2. ") : "Output should display second medication";
+        assertTrue(output.contains("Medications sorted by expiry date:"), "Output should contain header");
+        assertTrue(output.contains("1. "), "Output should display first medication");
+        assertTrue(output.contains("2. "), "Output should display second medication");
     }
 }
