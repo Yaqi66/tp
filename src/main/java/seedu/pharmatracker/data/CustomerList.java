@@ -8,6 +8,9 @@ import java.util.ArrayList;
  */
 public class CustomerList {
     private ArrayList<Customer> customers;
+    /**
+     * Initializes an empty list of customers.
+     */
 
     public CustomerList() {
         this.customers = new ArrayList<>();
@@ -63,6 +66,8 @@ public class CustomerList {
 
     /**
      * Returns the number of customers currently in the system.
+     *
+     * @return The total count of customers.
      */
     public int size() {
         return customers.size();
