@@ -33,7 +33,7 @@ application {
 }
 
 shadowJar {
-    archiveBaseName.set("duke")
+    archiveBaseName.set("PharmaTracker")
     archiveClassifier.set("")
 }
 
@@ -43,4 +43,5 @@ checkstyle {
 
 run{
     standardInput = System.in
+    enableAssertions = true
 }
