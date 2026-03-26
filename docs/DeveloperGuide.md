@@ -2,12 +2,59 @@
 
 ## Acknowledgements
 
-{list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
+Beyond the Java Standard Library, no other libraries were used. No code was reused as well.
 
-## Design & implementation
+## Setting up, getting started
+
+{Update with instructions on setting up}
+
+## Design
+
+### Architecture
+
+### UI Component
+
+{Update with information about UI Architecture}
+
+### Command Component
+
+{Update with information about Command Architecture}
+
+### Parser Component
+
+{Update with information about Parser Architecture}
+
+### Storage Component
+
+{Update with information about Storage Component}
+
+## Implementation
+
+This section describes some noteworthy details on how certain features are implemented.
 
 {Describe the design and implementation of the product. Use UML diagrams and short code snippets where applicable.}
 
+### Add Medication Feature
+
+This add-medication mechanism allows users to record a new medication 
+with the name, dosage, quantity and expiry date information.
+```
+add /n NAME /d DOSAGE /q QUANTITY /e EXPIRY [/t TAG]
+```
+#### How it works
+
+The following steps describe how an add command is processed. 
+
+1. The user enters `add /n Paracetamol /d 500mg /q 100 /e 2026-12-31 /t Painkiller`.
+2. `PharmaTracker.run()` reads the user input and passes the raw string to `Parser.parse()`.
+3. `Parser.parse()` identifies the command word `add`.
+4. The parser then delegates the specific extract methods 
+   (such as `extractName()`, `extractDosage()`, `extractQuantity` and `extractExpiryDate()`). 
+   These methods locate the corresponding flag prefixes (e.g. `/n`, `/d`, `/q`, `/e`) using string indexing to extract the arguments.
+   Optional flags are extracted using `extractFlag()` or `extractWarnings()`.
+5. The extracted values are used to create a new `AddCommand` object. 
+6. `PharmaTracker.run()` calls `AddCommand.execute()`, which creates a new `Medication` object and adds it to the `Inventory`.
+7. Finally, `Ui.printAddedMessage()` is called to display a confirmation message to the user. 
 
 ## Product scope
 ### Target user profile
