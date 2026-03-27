@@ -1,4 +1,4 @@
-package seedu.pharmatracker.data;
+package seedu.pharmatracker.customer;
 
 import java.util.ArrayList;
 
@@ -8,10 +8,11 @@ import java.util.ArrayList;
  */
 public class CustomerList {
     private ArrayList<Customer> customers;
+    private int customerCount;
+
     /**
      * Initializes an empty list of customers.
      */
-
     public CustomerList() {
         this.customers = new ArrayList<>();
     }
@@ -24,6 +25,7 @@ public class CustomerList {
     public void addCustomer(Customer customer) {
         assert customer != null : "Cannot add a null customer";
         customers.add(customer);
+        customerCount++;
     }
 
     /**
@@ -34,6 +36,7 @@ public class CustomerList {
     public void deleteCustomer(int index) {
         assert index >= 0 && index < customers.size() : "Index out of bounds";
         customers.remove(index);
+        customerCount--;
     }
 
     /**
@@ -45,6 +48,10 @@ public class CustomerList {
     public Customer getCustomer(int index) {
         assert index >= 0 && index < customers.size() : "Index out of bounds";
         return customers.get(index);
+    }
+
+    public int getCustomerCount() {
+        return customerCount;
     }
 
     /**

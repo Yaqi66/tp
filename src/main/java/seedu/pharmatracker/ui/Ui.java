@@ -3,7 +3,8 @@ package seedu.pharmatracker.ui;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-import seedu.pharmatracker.data.Customer;
+import seedu.pharmatracker.customer.Customer;
+import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 
@@ -28,6 +29,7 @@ public class Ui {
     private static final String MESSAGE_DELETED = "You have deleted the following medication:";
     private static final String MESSAGE_WELCOME = "Welcome to Pharma Tracker!\nWhat can I do for you today?";
     private static final String MESSAGE_COMMAND = "Enter command: ";
+    private static final String MESSAGE_ADDED_CUSTOMER = "You have added the following customer:";
 
     private final Scanner in;
 
@@ -117,6 +119,17 @@ public class Ui {
                 MESSAGE_DELETED,
                 INDENT + med.toString(),
                 "You now have " + count + " medications in your inventory!",
+                DIVIDER
+        );
+    }
+
+    public void printAddedCustomerMessage(Customer customer, CustomerList customerList) {
+        int count = customerList.getCustomerCount();
+        printToScreen(
+                DIVIDER,
+                MESSAGE_ADDED_CUSTOMER,
+                INDENT + customer.toString(),
+                "You now have " + count + " customers in your database!",
                 DIVIDER
         );
     }
