@@ -15,6 +15,7 @@ import seedu.pharmatracker.command.ExitCommand;
 import seedu.pharmatracker.command.LabelCommand;
 import seedu.pharmatracker.command.ExpiringCommand;
 import seedu.pharmatracker.command.ViewCustomerCommand;
+import seedu.pharmatracker.command.RestockCommand;
 import seedu.pharmatracker.exceptions.PharmaTrackerException;
 
 /**
@@ -342,6 +343,21 @@ public class Parser {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid format. Usage: viewcustomer INDEX");
                 return null;
+            }
+
+        case RestockCommand.COMMAND_WORD:
+            if (description.isEmpty()) {
+                System.out.println("Please provide an index and quantity.");
+                break;
+            }
+            try {
+                String[] restockParts = description.trim().split("/q");
+                int restockIndex = Integer.parseInt(restockParts[0].trim());
+                int restockQuantity = Integer.parseInt(restockParts[1].trim());
+                return new RestockCommand(restockIndex, restockQuantity);
+            } catch (Exception e) {
+                System.out.println("Invalid format. Use: restock INDEX /q QUANTITY");
+                break;
             }
 
         case HelpCommand.COMMAND_WORD:
