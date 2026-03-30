@@ -46,6 +46,8 @@ public class Parser {
         FLAG_ROUTE, FLAG_MAX_DOSAGE, FLAG_WARNINGS
     };
 
+    private static final String[] CUSTOMER_UPDATE_FLAGS = {"/n", "/p", "/a"};
+
     /**
      * Finds the index of the next flag appearing in the description string after a specified index.
      * This is used to determine the end bound of a flag's associated value.
@@ -229,8 +231,6 @@ public class Parser {
         }
         return warnings;
     }
-
-    private static final String[] CUSTOMER_UPDATE_FLAGS = {"/n", "/p", "/a"};
 
     /**
      * Extracts an optional customer flag for updatecustomer, returning {@code null} if absent.

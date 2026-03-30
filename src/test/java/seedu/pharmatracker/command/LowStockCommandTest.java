@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 import seedu.pharmatracker.ui.Ui;
@@ -18,6 +19,7 @@ public class LowStockCommandTest {
 
     private Inventory inventory;
     private Ui ui;
+    private CustomerList customerList;
     private ByteArrayOutputStream outContent;
     private final PrintStream originalOut = System.out;
 
@@ -25,6 +27,7 @@ public class LowStockCommandTest {
     public void setUp() {
         inventory = new Inventory();
         ui = new Ui();
+        customerList = new CustomerList();
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }
@@ -39,7 +42,7 @@ public class LowStockCommandTest {
         inventory.addMedication(new Medication("Ibuprofen", "400mg", 5, "15/06/2026", ""));
         inventory.addMedication(new Medication("Paracetamol", "500mg", 25, "01/01/2027", ""));
 
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("Ibuprofen"));
@@ -52,7 +55,7 @@ public class LowStockCommandTest {
         inventory.addMedication(new Medication("Paracetamol", "500mg", 20, "01/01/2027", ""));
         inventory.addMedication(new Medication("Aspirin", "100mg", 50, "01/01/2027", ""));
 
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("No medications are low on stock"));
@@ -64,7 +67,7 @@ public class LowStockCommandTest {
         inventory.addMedication(new Medication("Paracetamol", "500mg", 25, "01/01/2027", ""));
         inventory.addMedication(new Medication("Aspirin", "100mg", 60, "01/01/2027", ""));
 
-        new LowStockCommand(50).execute(inventory, ui);
+        new LowStockCommand(50).execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("Ibuprofen"));
@@ -75,7 +78,7 @@ public class LowStockCommandTest {
 
     @Test
     public void execute_emptyInventory_printsNoLowStockMessage() {
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("No medications are low on stock"));
@@ -86,7 +89,7 @@ public class LowStockCommandTest {
         inventory.addMedication(new Medication("MedA", "10mg", 3, "01/01/2027", ""));
         inventory.addMedication(new Medication("MedB", "20mg", 10, "01/01/2027", ""));
 
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("MedA"));
@@ -98,7 +101,7 @@ public class LowStockCommandTest {
     public void execute_outputContainsMedicationDetails() {
         inventory.addMedication(new Medication("Ibuprofen", "400mg", 5, "15/06/2026", ""));
 
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("Ibuprofen"));
@@ -116,7 +119,7 @@ public class LowStockCommandTest {
     public void execute_quantityExactlyAtThreshold_notIncluded() {
         inventory.addMedication(new Medication("Ibuprofen", "400mg", 20, "15/06/2026", ""));
 
-        new LowStockCommand().execute(inventory, ui);
+        new LowStockCommand().execute(inventory, ui, customerList);
 
         String output = outContent.toString();
         assertTrue(output.contains("No medications are low on stock"));
