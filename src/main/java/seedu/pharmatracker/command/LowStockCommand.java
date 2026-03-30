@@ -3,6 +3,7 @@ package seedu.pharmatracker.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 import seedu.pharmatracker.ui.Ui;
@@ -27,7 +28,7 @@ public class LowStockCommand extends Command {
     }
 
     @Override
-    public void execute(Inventory inventory, Ui ui) {
+    public void execute(Inventory inventory, Ui ui, CustomerList customerList) {
         assert inventory != null : "Inventory cannot be null in LowStockCommand execution.";
         assert ui != null : "Ui cannot be null in LowStockCommand execution.";
         List<Medication> lowStockMeds = new ArrayList<>();
