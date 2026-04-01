@@ -1,0 +1,23 @@
+@startuml
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 2
+
+actor User
+participant ":PharmaTracker" as PT
+participant ":Parser" as Parser
+participant ":ListCustomersCommand" as Cmd
+participant ":CustomerList" as CustList
+
+User -> PT : run()
+PT -> Parser : parse("listcustomers")
+Parser --> PT : new ListCustomersCommand()
+PT -> Cmd : execute(inventory, ui, customerList)
+Cmd -> CustList : getAllCustomers()
+CustList --> Cmd : customers
+
+alt customers is empty
+    Cmd --> User : "No customers registered yet."
+else customers exist
+    Cmd --> User : numbered list of customers + total count
+end
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 2
+
+actor User
+participant ":PharmaTracker" as PT
+participant ":Parser" as Parser
+participant ":RestockCommand" as Cmd
+participant ":Inventory" as Inv
+participant ":Medication" as Med
+
+User -> PT : run()
+PT -> Parser : parse("restock 1 /q 50")
+Parser --> PT : new RestockCommand(1, 50)
+PT -> Cmd : execute(inventory, ui, customerList)
+Cmd -> Inv : getMedications()
+Inv --> Cmd : medications
+
+alt invalid index or invalid quantity
+    Cmd --> User : error message
+else valid
+    Cmd -> Inv : getMedication(0)
+    Inv --> Cmd : med
+    Cmd -> Med : setQuantity(currentQty + 50)
+    Cmd --> User : "Restocked successfully! ..."
+end
+@enduml
