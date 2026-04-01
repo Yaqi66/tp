@@ -29,13 +29,12 @@ public class CustomerList {
     }
 
     /**
-     * Deletes a customer from the list based on their index.
+     * Removes a customer from the list.
      *
-     * @param index Zero-based index of the customer.
+     * @param customer The customer object to be removed.
      */
-    public void deleteCustomer(int index) {
-        assert index >= 0 && index < customers.size() : "Index out of bounds";
-        customers.remove(index);
+    public void removeCustomer(Customer customer) {
+        customers.remove(customer);
         customerCount--;
     }
 
