@@ -1,0 +1,24 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class Ui {
+    - in : Scanner
+    + printWelcomeMessage() : void
+    + readCommand() : String
+    + printMessage(message: String...) : void
+    + printAddedMessage(med: Medication, inventory: Inventory) : void
+    + printDeletedMessage(med: Medication, inventory: Inventory) : void
+    + printMedicationDetails(med: Medication) : void
+    + showCustomerDetails(customer: Customer) : void
+    + showExpiringMedications(expired: ArrayList, expiring: ArrayList, days: int) : void
+    + printLowStockList(lowStockMeds: List, threshold: int) : void
+    + printUpdatedCustomerMessage(customer: Customer) : void
+}
+
+note right of Ui
+  Handles all CLI inputs via Scanner
+  and formats output strings.
+end note
+
+@enduml

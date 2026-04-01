@@ -12,9 +12,46 @@ Beyond the Java Standard Library, no other libraries were used. No code was reus
 
 ### Architecture
 
+PharmaTracker employs a straightforward, command-driven architecture. The core execution loop resides within
+`PharmaTracker.run()` which continuously reads user input, parses it into an executable command, executes the
+command logic, and saves any modifications to local storage. 
+
+The key components of the system are outlined below. 
+
+| Component            | Responsibility                                                                                                                                                      |
+|:---------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PharmaTracker`      | Initializes the application components and manages the main execution loop (read → parse → execute → save).                                                         |
+| `Parser`             | Analyzes raw input strings from the user and translates them into specific, executable `Command` objects.                                                           |
+| `Command` (abstract) | Defines the required `execute()` contract. Concrete command classes (e.g., `AddCommand`, `DispenseCommand`) implement this to interact with the application's data. |
+| `Inventory`          | The in-memory data structure that stores and manages all `Medication` records.                                                                                      |
+| `CustomerList`       | The in-memory data structure that manages registered `Customer` profiles and their dispensing histories.                                                            |
+| `Storage`            | Handles the serialization and deserialization of data to a local text file (`data/pharmatracker.txt`) to ensure data persistence across sessions.                   |
+| `Ui`                 | Manages all interactions with the user, including reading terminal inputs and printing formatted outputs to the console.                                            |
+
+The following sequence diagram illustrates the complete runtime flow of PharmaTracker, from app initialization through 
+the continuous command execution loop:
+
+![Overall Architecture Sequence Diagram](images/ArchitectureSequence.png)
+
 ### UI Component
 
-{Update with information about UI Architecture}
+**API:** `Ui.java`
+
+The UI component is solely responsible for handling all interactions with the user. It resides within the `seedu.pharmatracker.ui` package and acts as the bridge between the application's internal logic and the console.
+
+**Key Responsibilities:**
+* **Input Reading:** It utilizes a `Scanner` to read raw string input from the standard input stream (CLI) via the `readCommand()` method.
+* **Output Formatting:** It standardizes the application's visual output (e.g., displaying the welcome message and applying consistent dividers to frame messages).
+* **Data Presentation:** It contains dedicated methods to beautifully format and display complex objects. For instance, `printMedicationDetails()` and `showCustomerDetails()` use `printf` formatting to align data cleanly into readable, tabular structures.
+
+**Design Constraints & Rules for Developers:**
+To maintain a clean architecture, the UI component is strictly separated from the logic and data models.
+* **No Direct Printing:** Developers should **never** use `System.out.println()` directly within `Command`, `Parser`, or `Inventory` classes.
+* **Data Handoff:** If a command needs to display a result, it must process the data and pass the relevant object to a specific method inside the `Ui` class to handle the actual printing.
+
+The following class diagram summarizes the `Ui` component's primary API. *(Note: Private string constants and standard constructors are omitted to reduce visual clutter).*
+
+![UI Component Class Diagram](images/UiClassDiagram.png)
 
 ### Command Component
 
@@ -43,16 +80,24 @@ add /n NAME /d DOSAGE /q QUANTITY /e EXPIRY [/t TAG]
 
 The following steps describe how an add command is processed.
 
-1. The user enters `add /n Paracetamol /d 500mg /q 100 /e 2026-12-31 /t Painkiller`.
+1. The user enters `add /n Paracetamol /d 500mg /q 100 /e 2026-12-31 
+   /t Painkiller /df Tablet /warn May cause drowsiness`.
 2. `PharmaTracker.run()` reads the user input and passes the raw string to `Parser.parse()`.
 3. `Parser.parse()` identifies the command word `add`.
-4. The parser then delegates the specific extract methods
-   (such as `extractName()`, `extractDosage()`, `extractQuantity` and `extractExpiryDate()`).
-   These methods locate the corresponding flag prefixes (e.g. `/n`, `/d`, `/q`, `/e`) using string indexing to extract the arguments.
-   Optional flags are extracted using `extractFlag()` or `extractWarnings()`.
-5. The extracted values are used to create a new `AddCommand` object.
-6. `PharmaTracker.run()` calls `AddCommand.execute()`, which creates a new `Medication` object and adds it to the `Inventory`.
-7. Finally, `Ui.printAddedMessage()` is called to display a confirmation message to the user.
+4. The parser first delegates to specific extract methods
+   (`extractName()`, `extractDosage()`, `extractQuantity` and `extractExpiryDate()`).
+   These methods validate that the mandatory flags (`/n`, `/d`, `/q`, `/e`) are present
+   and in the correct relative order.
+5. Next, the parser extracts optional attributes using the `extractFlag()` method. 
+   To allow users to input optional flags in any order, `extractFlag()` relies on a helper method called
+   `findNextFlagIndex()`. This helper scans the remainder of the input string against a predefined array of 
+   `ALL_FLAGS` to dynamically determine where the current flag's value ends and where the next one begins. 
+6. For warnings, the parser uses `extractWarnings()`, which loops through the input string to locate all
+   occurrences of the `/warn` flag, compiling them into an `ArrayList<String>`.
+7. All extracted values (both compulsory and optional) are passed into the `AddCommand` constructor 
+   to create a new `AddCommand` object.
+8. `PharmaTracker.run()` calls `AddCommand.execute()`, which creates a new `Medication` object and adds it to the `Inventory`. 
+9. Finally, `Ui.printAddedMessage()` is called to display a confirmation message to the user.
 
 The following sequence diagram shows the full flow of the add command, including parsing and inventory updates:
 
