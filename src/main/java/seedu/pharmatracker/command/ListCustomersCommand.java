@@ -1,6 +1,5 @@
 package seedu.pharmatracker.command;
 
-import seedu.pharmatracker.customer.Customer;
 import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.ui.Ui;
