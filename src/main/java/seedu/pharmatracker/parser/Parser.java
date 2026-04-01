@@ -6,6 +6,7 @@ import seedu.pharmatracker.command.AddCommand;
 import seedu.pharmatracker.command.AddCustomerCommand;
 import seedu.pharmatracker.command.Command;
 import seedu.pharmatracker.command.DeleteCommand;
+import seedu.pharmatracker.command.DeleteCustomerCommand;
 import seedu.pharmatracker.command.ListCommand;
 import seedu.pharmatracker.command.SortCommand;
 import seedu.pharmatracker.command.FindCommand;
@@ -580,6 +581,9 @@ public class Parser {
             String phone = extractCustomerPhone(description);
             String address = extractCustomerAddress(description);
             return new AddCustomerCommand(id, customerName, phone, address);
+
+        case DeleteCustomerCommand.COMMAND_WORD:
+            return new DeleteCustomerCommand(description);
 
         case UpdateCustomerCommand.COMMAND_WORD:
             if (description.isEmpty()) {

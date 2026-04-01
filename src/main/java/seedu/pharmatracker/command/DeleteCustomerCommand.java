@@ -22,6 +22,6 @@ public class DeleteCustomerCommand extends Command {
 
         Customer customer = customerList.getCustomer(zeroBasedIndex);
         customerList.removeCustomer(customer);
-
+        ui.printDeletedCustomerMessage(customer, customerList);
     }
 }

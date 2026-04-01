@@ -30,6 +30,7 @@ public class Ui {
     private static final String MESSAGE_WELCOME = "Welcome to Pharma Tracker!\nWhat can I do for you today?";
     private static final String MESSAGE_COMMAND = "Enter command: ";
     private static final String MESSAGE_ADDED_CUSTOMER = "You have added the following customer:";
+    public static final String MESSAGE_DELETED_CUSTOMER = "You have removed the following customer:";
 
     private final Scanner in;
 
@@ -128,6 +129,17 @@ public class Ui {
         printToScreen(
                 DIVIDER,
                 MESSAGE_ADDED_CUSTOMER,
+                INDENT + customer.toString(),
+                "You now have " + count + " customers in your database!",
+                DIVIDER
+        );
+    }
+
+    public void printDeletedCustomerMessage(Customer customer, CustomerList customerList) {
+        int count = customerList.getCustomerCount();
+        printToScreen(
+                DIVIDER,
+                MESSAGE_DELETED_CUSTOMER,
                 INDENT + customer.toString(),
                 "You now have " + count + " customers in your database!",
                 DIVIDER
