@@ -7,6 +7,10 @@ import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 import seedu.pharmatracker.ui.Ui;
 
+/**
+ * Updates one or more fields of an existing medication record in the inventory.
+ * Only the fields provided will be changed. All others remain unchanged.
+ */
 public class UpdateCommand extends Command {
 
     public static final String COMMAND_WORD = "update";
