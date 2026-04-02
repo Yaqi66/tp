@@ -33,6 +33,24 @@ public class UpdateCommand extends Command {
     private final String maxDailyDose;
     private final ArrayList<String> warnings;
 
+    /**
+     * Constructs an UpdateCommand with the specified fields to update.
+     * Any field that is not being updated should be passed as {@code null}.
+     *
+     * @param index        The 1-based index of the medication to update in the inventory.
+     * @param name         The new name of the medication, or {@code null} to leave unchanged.
+     * @param dosage       The new dosage of the medication, or {@code null} to leave unchanged.
+     * @param quantity     The new quantity of the medication, or {@code null} to leave unchanged.
+     * @param expiryDate   The new expiry date of the medication, or {@code null} to leave unchanged.
+     * @param tag          The new tag for the medication, or {@code null} to leave unchanged.
+     * @param dosageForm   The new dosage form, or {@code null} to leave unchanged.
+     * @param manufacturer The new manufacturer, or {@code null} to leave unchanged.
+     * @param directions   The new directions for use, or {@code null} to leave unchanged.
+     * @param frequency    The new frequency of intake, or {@code null} to leave unchanged.
+     * @param route        The new route of administration, or {@code null} to leave unchanged.
+     * @param maxDailyDose The new maximum daily dose, or {@code null} to leave unchanged.
+     * @param warnings     The new list of warnings, or {@code null} to leave unchanged.
+     */
     public UpdateCommand(int index, String name, String dosage, Integer quantity, String expiryDate, String tag,
                          String dosageForm, String manufacturer, String directions, String frequency, String route,
                          String maxDailyDose, ArrayList<String> warnings) {
@@ -51,6 +69,15 @@ public class UpdateCommand extends Command {
         this.warnings = warnings;
     }
 
+    /**
+     * Executes the update command by retrieving the medication at the specified index
+     * and applying the provided updates to its fields. Prints a confirmation message
+     * summarizing the changes made.
+     *
+     * @param inventory    The current inventory containing all stored medications.
+     * @param ui           The user interface used to display messages and interact with the user.
+     * @param customerList The list of registered customers in the system.
+     */
     @Override
     public void execute(Inventory inventory, Ui ui, CustomerList customerList) {
         assert inventory != null : "Inventory cannot be null in UpdateCommand execution.";
