@@ -110,7 +110,7 @@ public class Ui {
      * Displays a confirmation message indicating that a medication has been successfully
      * removed from the inventory, along with the updated total medication count.
      *
-     * @param med The {@link Medication} that was just deleted.
+     * @param med       The {@link Medication} that was just deleted.
      * @param inventory The current {@Link Inventory} to retrieve the updated total count.
      */
     public void printDeletedMessage(Medication med, Inventory inventory) {
@@ -128,7 +128,7 @@ public class Ui {
      * Displays a confirmation message indicating that a customer has been successfully
      * added to the database, along with the updated total customer count.
      *
-     * @param customer THe {@link Customer} that was added.
+     * @param customer     THe {@link Customer} that was added.
      * @param customerList The current {@link CustomerList} to retrieve the updated total count.
      */
     public void printAddedCustomerMessage(Customer customer, CustomerList customerList) {
@@ -146,7 +146,7 @@ public class Ui {
      * Displays a confirmation message indicating that a customer has been successfully
      * removed from the database, along with the updated total customer count.
      *
-     * @param customer The {@link Customer} that was removed.
+     * @param customer     The {@link Customer} that was removed.
      * @param customerList The current {@link CustomerList} to retrieve the updated total count.
      */
     public void printDeletedCustomerMessage(Customer customer, CustomerList customerList) {
@@ -311,7 +311,21 @@ public class Ui {
                 DIVIDER
         );
     }
-    
+
+    /**
+     * Displays the list of customers matching a name search keyword.
+     *
+     * @param keyword The keyword that was searched.
+     * @param matches The list of matching customers to display.
+     */
+    public void printFindCustomerResults(String keyword, ArrayList<Customer> matches) {
+        printMessage("Customers matching \"" + keyword + "\" (" + matches.size() + " found):");
+        for (int i = 0; i < matches.size(); i++) {
+            System.out.println((i + 1) + ". " + matches.get(i).toString());
+        }
+        System.out.println(DIVIDER);
+    }
+
     /**
      * Displays a numbered list of all registered customers.
      *

@@ -19,6 +19,7 @@ import seedu.pharmatracker.command.LabelCommand;
 import seedu.pharmatracker.command.ExpiringCommand;
 import seedu.pharmatracker.command.LowStockCommand;
 import seedu.pharmatracker.command.UpdateCustomerCommand;
+import seedu.pharmatracker.command.FindCustomerCommand;
 import seedu.pharmatracker.command.ViewCustomerCommand;
 import seedu.pharmatracker.command.RestockCommand;
 import seedu.pharmatracker.exceptions.PharmaTrackerException;
@@ -56,7 +57,7 @@ public class Parser {
      * This is used to determine the end bound of a flag's associated value.
      *
      * @param description The raw string containing command arguments.
-     * @param afterIndex The index to start searching from.
+     * @param afterIndex  The index to start searching from.
      * @return The index of the next occurring flag, or the length of the string if no more flags exist.
      * @throws PharmaTrackerException If the search index provided is invalid.
      */
@@ -79,7 +80,7 @@ public class Parser {
      * Extracts the string value associated with a generic optional flag.
      *
      * @param description The raw string containing command arguments.
-     * @param flag The specific flag to search for.
+     * @param flag        The specific flag to search for.
      * @return The extracted string value, or an empty string if the flag is not present.
      * @throws PharmaTrackerException If the flag is present but has no accompanying value.
      */
@@ -183,6 +184,7 @@ public class Parser {
 
     /**
      * Extracts the mandatory medication expiry date from the user input.
+     *
      * @param description The raw string containing command arguments.
      * @return The extracted medication expiry date.
      * @throws PharmaTrackerException If the format is invalid, missing flags, or if the expiry date is empty.
@@ -240,7 +242,7 @@ public class Parser {
      * Unlike extractFlag, this returns null if the flag is not present.
      *
      * @param description The raw string containing command arguments.
-     * @param flag The specific flag to search for.
+     * @param flag        The specific flag to search for.
      * @return The extracted string value, or null if the flag is not present.
      * @throws PharmaTrackerException If the flag is present but has no accompanying value.
      */
@@ -455,8 +457,8 @@ public class Parser {
             String maxDailyDose = extractFlag(description, FLAG_MAX_DOSAGE);
             ArrayList<String> warnings = extractWarnings(description);
             return new AddCommand(name, dosage, quantity, expiryDate, tag,
-                                  dosageForm, manufacturer, directions, frequency,
-                                  route, maxDailyDose, warnings);
+                    dosageForm, manufacturer, directions, frequency,
+                    route, maxDailyDose, warnings);
 
         case DeleteCommand.COMMAND_WORD:
             return new DeleteCommand(description);
@@ -603,12 +605,18 @@ public class Parser {
                         "Invalid index! The first argument must be a valid number.");
             }
 
+        case FindCustomerCommand.COMMAND_WORD:
+            if (description.trim().isEmpty()) {
+                System.out.println("Please provide a name to search for. Usage: find-customer <name>");
+            }
+            return new FindCustomerCommand(description.trim());
+
         case ViewCustomerCommand.COMMAND_WORD:
             try {
                 int index = Integer.parseInt(description.trim());
                 return new ViewCustomerCommand(index);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid format. Usage: viewcustomer INDEX");
+                System.out.println("Invalid format. Usage: view-customer INDEX");
                 return null;
             }
 
