@@ -9,20 +9,15 @@ fast typists who prefer a CLI workflow over GUI applications.
 ## Summary of Contributions
 
 ### Code Contributed
-[View my code on RepoSense](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=&sort=groupTitle&sortWithin=title&timeframe=commit&mergegroup=&groupSelect=groupByRepos&breakdown=true&checkedFileTypes=docs~functional-code~test-code~other&since=2026-02-20T00%3A00%3A00&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=karthikkathiresh&tabRepo=AY2526S2-CS2113-T10-3%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code~other&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
-*(Note: Adjust the date or specific parameters in the URL to match your exact milestone timelines).*
+[View my code on RepoSense](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=karthikkathiresh&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=)
 
 ### Enhancements Implemented
-
-* **[Application Architecture and Base Code Setup]** (v1.0):
-    * **What it does:** *Established the foundational codebase and the main execution loop required for the overall 
-                         PharmaTracker application to run.*
-  * **Justification:** *This was a critical initial step. By establishing the core structure early, it enabled all group members to work independently.*
-  * **Technical Highlights:** *Implemented the main entry class, `PharmaTracker`. 
-                               Created the `Medication` and `Inventory` classes to manage medical data. 
-                               Created the `Ui` class to handle inputs and outputs. 
-                               Implemented a skeleton of the `Parser` class to define the execution flow for different application commands. 
-                               Configured the testing infrastructure by updating `runtest.bat` and `EXPECTED.TXT` for CI validation.*
+- **Application Architecture and Base Code Setup** (v1.0): Set up the foundational codebase and main execution loop for the `PharmaTracker` application. This involved implementing the main `PharmaTracker` entry class, the `Medication` and `Inventory` classes to manage data, the `Ui` class for input-output handling, and a skeleton for the `Parser` class.
+- **Add Medication Feature** (v1.0): 
+- **Delete Medication Feature** (v1.0): 
+- **Update Medication Feature** (v2.0): 
+- **Add Customer Feature** (v2.0): 
+- **Delete Customer Feature** (v2.0): 
 
 * **[Add Medication Feature]** (v1.0):
     * **What it does:** *Allows users to log a new medication into the inventory. 
@@ -34,7 +29,7 @@ fast typists who prefer a CLI workflow over GUI applications.
                                  Update the `Ui` class to print a message to the user upon successful addition of the medication.
                                  The `execute` method throws a `PharmaTrackeException` to handle all possible input errors.*
 
-* **Delete Medication Feature** (vX.X):
+* **Delete Medication Feature** (v1.0):
   * **What it does:** *Allows users to safely remove a specific medication from the inventory by referencing its 
                        1-based index as shown in the inventory list.*
   * **Technical Highlights:** *Implemented the `DeleteCommand` class which handles parsing the user input and 
