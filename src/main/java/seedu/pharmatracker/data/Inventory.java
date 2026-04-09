@@ -78,10 +78,6 @@ public class Inventory {
     }
 
     /**
-     * Prints a formatted list of all medications currently in the inventory to the console.
-     * If the inventory is empty, prints a notification message instead.
-     */
-    /**
      * Returns the dispense log associated with this inventory.
      *
      * @return The {@link DispenseLog} containing all recorded dispense events.
@@ -100,6 +96,10 @@ public class Inventory {
         this.dispenseLog = dispenseLog;
     }
 
+    /**
+     * Prints a formatted list of all medications currently in the inventory to the console.
+     * If the inventory is empty, prints a notification message instead.
+     */
     public void listMedications() {
         if (medications.isEmpty()) {
             System.out.println("Inventory is empty.");
