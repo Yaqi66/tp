@@ -1,7 +1,8 @@
 @startuml
 actor User
 participant ":PharmaTracker" as PharmaTracker
-participant ":Parser" as Parser
+participant ":PharmaTrackerParser" as PharmaTrackerParser
+participant ":UpdateCommandParser" as UpdateCommandParser
 participant "u:UpdateCommand" as UpdateCommand
 participant ":Inventory" as Inventory
 participant "med:Medication" as Medication
@@ -10,16 +11,26 @@ participant ":Ui" as Ui
 User -> PharmaTracker : update 1 /q 50
 activate PharmaTracker
 
-PharmaTracker -> Parser : parse("update 1 /q 50")
-activate Parser
+PharmaTracker -> PharmaTrackerParser : parseCommand("update 1 /q 50")
+activate PharmaTrackerParser
 
-Parser -> Parser : extractOptionalQuantity()
-activate Parser
+create UpdateCommandParser
+PharmaTrackerParser -> UpdateCommandParser : new UpdateCommandParser()
+activate UpdateCommandParser
+return
+
+PharmaTrackerParser -> UpdateCommandParser : parse("1 /q 50")
+activate UpdateCommandParser
+
+UpdateCommandParser -> UpdateCommandParser : extractOptionalQuantity()
+activate UpdateCommandParser
 return quantity
 
 create UpdateCommand
-Parser -> UpdateCommand : new UpdateCommand(...)
+UpdateCommandParser -> UpdateCommand : new UpdateCommand(...)
 activate UpdateCommand
+return u
+
 return u
 
 return u
