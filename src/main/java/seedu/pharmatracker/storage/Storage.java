@@ -1,13 +1,18 @@
 package seedu.pharmatracker.storage;
 
+import seedu.pharmatracker.alert.RestockAlert;
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +25,9 @@ public class Storage {
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
     private static final String CUSTOMER_FILE_PATH = "data/customers.txt";
     private static final String HISTORY_SEPARATOR = ";";
+    private static final String USERS_FILE_PATH = "data/users.txt";
+    private static final String SESSION_FILE_PATH = "data/session.txt";
+    private static final String ALERTS_FILE_PATH = "data/alerts.txt";
 
     public void save(Inventory inventory) {
         assert inventory != null : "Inventory should not be null";
@@ -42,7 +50,8 @@ public class Storage {
                         + med.getFrequency() + DELIMITER
                         + med.getRoute() + DELIMITER
                         + med.getMaxDailyDose() + DELIMITER
-                        + warnings + "\n");
+                        + warnings + DELIMITER
+                        + med.getMinimumStockThreshold() + "\n");
             }
             fw.close();
             logger.log(Level.INFO, "Inventory saved successfully with {0} entries",
@@ -94,6 +103,9 @@ public class Storage {
                 String route        = parts.length > 9  ? parts[9]  : "";
                 String maxDailyDose = parts.length > 10 ? parts[10] : "";
                 String warningsRaw  = parts.length > 11 ? parts[11] : "";
+                int minimumStockThreshold = parts.length > 12
+                    ? Integer.parseInt(parts[12])
+                    : Medication.DEFAULT_MINIMUM_STOCK_THRESHOLD;
 
                 Medication med = new Medication(name, dosage, quantity, expiry, tag);
                 med.setDosageForm(dosageForm);
@@ -102,6 +114,7 @@ public class Storage {
                 med.setFrequency(frequency);
                 med.setRoute(route);
                 med.setMaxDailyDose(maxDailyDose);
+                med.setMinimumStockThreshold(minimumStockThreshold);
                 if (!warningsRaw.isEmpty()) {
                     Arrays.stream(warningsRaw.split(WARNINGS_SEPARATOR))
                             .forEach(med::addWarning);
@@ -187,5 +200,182 @@ public class Storage {
             System.out.println("Customer file not found.");
         }
         return list;
+    }
+
+    /**
+     * Saves all registered users and password hashes.
+     *
+     * @param users Map of username to password hash.
+     */
+    public void saveUsers(Map<String, String> users) {
+        if (users == null) {
+            return;
+        }
+        try {
+            File file = new File(USERS_FILE_PATH);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);
+            for (Map.Entry<String, String> entry : users.entrySet()) {
+                fw.write(entry.getKey() + DELIMITER + entry.getValue() + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving user data: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads registered users and password hashes.
+     *
+     * @return Map of username to password hash.
+     */
+    public Map<String, String> loadUsers() {
+        Map<String, String> users = new HashMap<>();
+        File file = new File(USERS_FILE_PATH);
+        if (!file.exists()) {
+            return users;
+        }
+        try {
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine().trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+                String[] parts = line.split("\\|", 2);
+                if (parts.length == 2) {
+                    users.put(parts[0].trim(), parts[1].trim());
+                }
+            }
+            sc.close();
+        } catch (Exception e) {
+            System.out.println("Error loading user data: " + e.getMessage());
+        }
+        return users;
+    }
+
+    /**
+     * Persists the currently logged-in username for session continuity.
+     *
+     * @param username Username to persist, or null to clear session.
+     */
+    public void saveSession(String username) {
+        try {
+            File file = new File(SESSION_FILE_PATH);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);
+            if (username != null && !username.trim().isEmpty()) {
+                fw.write(username.trim());
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving session data: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads the persisted session username.
+     *
+     * @return Session username, or null if no active session exists.
+     */
+    public String loadSession() {
+        File file = new File(SESSION_FILE_PATH);
+        if (!file.exists()) {
+            return null;
+        }
+
+        try {
+            Scanner sc = new Scanner(file);
+            if (!sc.hasNextLine()) {
+                sc.close();
+                return null;
+            }
+            String username = sc.nextLine().trim();
+            sc.close();
+            return username.isEmpty() ? null : username;
+        } catch (Exception e) {
+            System.out.println("Error loading session data: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Saves full alert history to storage.
+     *
+     * @param alertHistory Complete alert history list.
+     */
+    public void saveAlertHistory(List<RestockAlert> alertHistory) {
+        if (alertHistory == null) {
+            return;
+        }
+
+        try {
+            File file = new File(ALERTS_FILE_PATH);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);
+            for (RestockAlert alert : alertHistory) {
+                fw.write(alert.getId() + DELIMITER
+                        + alert.getMedicationKey() + DELIMITER
+                        + alert.getMedicationName() + DELIMITER
+                        + alert.getCurrentStock() + DELIMITER
+                        + alert.getThreshold() + DELIMITER
+                        + alert.getCreatedAtString() + DELIMITER
+                        + alert.isAcknowledged() + DELIMITER
+                        + alert.getAcknowledgedAtString() + DELIMITER
+                        + alert.getAcknowledgmentNote() + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving alert history: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads alert history from storage.
+     *
+     * @return Persisted alert history list.
+     */
+    public ArrayList<RestockAlert> loadAlertHistory() {
+        ArrayList<RestockAlert> alertHistory = new ArrayList<>();
+        File file = new File(ALERTS_FILE_PATH);
+        if (!file.exists()) {
+            return alertHistory;
+        }
+
+        try {
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine().trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = line.split("\\|", -1);
+                if (parts.length < 9) {
+                    continue;
+                }
+
+                LocalDateTime createdAt = RestockAlert.parseDateTime(parts[5]);
+                boolean acknowledged = Boolean.parseBoolean(parts[6]);
+                LocalDateTime acknowledgedAt = RestockAlert.parseDateTime(parts[7]);
+                RestockAlert alert = new RestockAlert(
+                        parts[0],
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        createdAt,
+                        acknowledged,
+                        acknowledgedAt,
+                        parts[8]
+                );
+                alertHistory.add(alert);
+            }
+            sc.close();
+        } catch (Exception e) {
+            System.out.println("Error loading alert history: " + e.getMessage());
+        }
+
+        return alertHistory;
     }
 }

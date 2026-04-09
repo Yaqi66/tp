@@ -2,6 +2,9 @@ package seedu.pharmatracker.parser;
 
 import seedu.pharmatracker.command.AddCommand;
 import seedu.pharmatracker.command.AddCustomerCommand;
+import seedu.pharmatracker.command.AlertHistoryCommand;
+import seedu.pharmatracker.command.AlertsCommand;
+import seedu.pharmatracker.command.AcknowledgeAlertCommand;
 import seedu.pharmatracker.command.Command;
 import seedu.pharmatracker.command.DeleteCommand;
 import seedu.pharmatracker.command.DeleteCustomerCommand;
@@ -15,7 +18,11 @@ import seedu.pharmatracker.command.HelpCommand;
 import seedu.pharmatracker.command.ExitCommand;
 import seedu.pharmatracker.command.LabelCommand;
 import seedu.pharmatracker.command.ExpiringCommand;
+import seedu.pharmatracker.command.LoginCommand;
 import seedu.pharmatracker.command.LowStockCommand;
+import seedu.pharmatracker.command.LogoutCommand;
+import seedu.pharmatracker.command.RegisterCommand;
+import seedu.pharmatracker.command.SetThresholdCommand;
 import seedu.pharmatracker.command.UpdateCustomerCommand;
 import seedu.pharmatracker.command.FindCustomerCommand;
 import seedu.pharmatracker.command.ViewCustomerCommand;
@@ -220,11 +227,80 @@ public class PharmaTrackerParser {
         case ListCustomersCommand.COMMAND_WORD:
             return new ListCustomersCommand();
 
+        case RegisterCommand.COMMAND_WORD:
+            if (description.isEmpty()) {
+                throw new PharmaTrackerException("Invalid format! Use: register USERNAME /p PASSWORD");
+            }
+            return parseRegisterOrLogin(description, true);
+
+        case LoginCommand.COMMAND_WORD:
+            if (description.isEmpty()) {
+                throw new PharmaTrackerException("Invalid format! Use: login USERNAME /p PASSWORD");
+            }
+            return parseRegisterOrLogin(description, false);
+
+        case LogoutCommand.COMMAND_WORD:
+            return new LogoutCommand();
+
+        case SetThresholdCommand.COMMAND_WORD:
+            return parseSetThreshold(description);
+
+        case AlertsCommand.COMMAND_WORD:
+            return new AlertsCommand();
+
+        case AcknowledgeAlertCommand.COMMAND_WORD:
+            return parseAcknowledgeAlert(description);
+
+        case AlertHistoryCommand.COMMAND_WORD:
+            return new AlertHistoryCommand();
+
         default:
             throw new PharmaTrackerException("Unknown command! " +
                     "Please type 'help' to see the list of available commands.");
         }
 
         return null;
+    }
+
+    private static Command parseRegisterOrLogin(String description, boolean isRegister)
+            throws PharmaTrackerException {
+        String[] parts = description.trim().split("/p", 2);
+        if (parts.length != 2) {
+            throw new PharmaTrackerException("Invalid format! Use: "
+                    + (isRegister ? "register" : "login") + " USERNAME /p PASSWORD");
+        }
+
+        String username = parts[0].trim();
+        String password = parts[1].trim();
+        if (username.isEmpty() || password.isEmpty()) {
+            throw new PharmaTrackerException("Username and password must not be empty.");
+        }
+
+        return isRegister ? new RegisterCommand(username, password)
+                : new LoginCommand(username, password);
+    }
+
+    private static Command parseSetThreshold(String description) throws PharmaTrackerException {
+        String[] parts = description.trim().split("/threshold", 2);
+        if (parts.length != 2) {
+            throw new PharmaTrackerException("Invalid format! Use: set-threshold INDEX /threshold NUMBER");
+        }
+
+        try {
+            int index = Integer.parseInt(parts[0].trim());
+            int threshold = Integer.parseInt(parts[1].trim());
+            return new SetThresholdCommand(index, threshold);
+        } catch (NumberFormatException e) {
+            throw new PharmaTrackerException("Invalid format! INDEX and threshold must be whole numbers.");
+        }
+    }
+
+    private static Command parseAcknowledgeAlert(String description) throws PharmaTrackerException {
+        try {
+            int index = Integer.parseInt(description.trim());
+            return new AcknowledgeAlertCommand(index);
+        } catch (NumberFormatException e) {
+            throw new PharmaTrackerException("Invalid format! Use: ack-alert ALERT_INDEX");
+        }
     }
 }

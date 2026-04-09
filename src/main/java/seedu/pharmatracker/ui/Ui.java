@@ -3,6 +3,7 @@ package seedu.pharmatracker.ui;
 import java.util.Scanner;
 import java.util.ArrayList;
 
+import seedu.pharmatracker.alert.RestockAlert;
 import seedu.pharmatracker.customer.Customer;
 import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
@@ -300,6 +301,79 @@ public class Ui {
     }
 
     /**
+     * Prints active automatic restock alerts.
+     *
+     * @param activeAlerts Active, unacknowledged alerts.
+     */
+    public void printActiveAlerts(ArrayList<RestockAlert> activeAlerts) {
+        System.out.println(DIVIDER);
+        if (activeAlerts.isEmpty()) {
+            System.out.println("No active restock alerts.");
+            System.out.println(DIVIDER);
+            return;
+        }
+
+        System.out.println("Active Restock Alerts:");
+        for (int i = 0; i < activeAlerts.size(); i++) {
+            RestockAlert alert = activeAlerts.get(i);
+            System.out.println((i + 1) + ". " + alert.getMedicationName()
+                    + " | Current Stock: " + alert.getCurrentStock()
+                    + " | Threshold: " + alert.getThreshold()
+                    + " | Created: " + alert.getCreatedAtString());
+        }
+        System.out.println("Use 'ack-alert ALERT_INDEX' to acknowledge an alert.");
+        System.out.println(DIVIDER);
+    }
+
+    /**
+     * Prints full restock alert history including acknowledged and auto-resolved alerts.
+     *
+     * @param history Full alert history list.
+     */
+    public void printAlertHistory(ArrayList<RestockAlert> history) {
+        System.out.println(DIVIDER);
+        if (history.isEmpty()) {
+            System.out.println("No restock alert history found.");
+            System.out.println(DIVIDER);
+            return;
+        }
+
+        System.out.println("Restock Alert History:");
+        for (int i = 0; i < history.size(); i++) {
+            RestockAlert alert = history.get(i);
+            String status = alert.isAcknowledged()
+                    ? "Acknowledged"
+                    : "Active";
+            System.out.println((i + 1) + ". " + alert.getMedicationName()
+                    + " | Stock: " + alert.getCurrentStock()
+                    + " | Threshold: " + alert.getThreshold()
+                    + " | Status: " + status
+                    + " | Created: " + alert.getCreatedAtString());
+        }
+        System.out.println(DIVIDER);
+    }
+
+    /**
+     * Prints a concise summary for newly detected active alerts.
+     *
+     * @param activeAlerts Active alerts to summarize.
+     */
+    public void printAutoRestockAlertSummary(ArrayList<RestockAlert> activeAlerts) {
+        if (activeAlerts.isEmpty()) {
+            return;
+        }
+
+        System.out.println(DIVIDER);
+        System.out.println("AUTO RESTOCK ALERT: " + activeAlerts.size() + " medication(s) below threshold.");
+        for (RestockAlert alert : activeAlerts) {
+            System.out.println("- " + alert.getMedicationName() + " | Stock: " + alert.getCurrentStock()
+                    + " | Min Threshold: " + alert.getThreshold());
+        }
+        System.out.println("Use 'alerts' to view details or 'ack-alert ALERT_INDEX' to acknowledge.");
+        System.out.println(DIVIDER);
+    }
+
+    /**
      * Prints a confirmation message after a customer record has been successfully updated.
      *
      * @param customer The updated {@link Customer}.
@@ -374,16 +448,24 @@ public class Ui {
         System.out.println("10. Restock Medication       (restock INDEX /q QUANTITY)");
         System.out.println("11. Low Stock Alert          (lowstock | lowstock /threshold NUMBER)");
         System.out.println("12. Expiring Medications     (expiring | expiring /days NUMBER)");
+        System.out.println("13. Set Min Threshold        (set-threshold INDEX /threshold NUMBER)");
+        System.out.println("14. View Active Alerts       (alerts)");
+        System.out.println("15. Acknowledge Alert        (ack-alert ALERT_INDEX)");
+        System.out.println("16. View Alert History       (alert-history)");
         System.out.println("--- Customer Commands ---");
-        System.out.println("13. Add Customer             (add-customer /n NAME /p PHONE /a ADDRESS)");
-        System.out.println("14. Delete Customer          (delete-customer INDEX)");
-        System.out.println("15. Update Customer          (update-customer INDEX /n NAME /p PHONE /a ADDRESS)");
-        System.out.println("16. List Customers           (list-customers)");
-        System.out.println("17. Find Customer            (find-customer KEYWORD)");
-        System.out.println("18. View Customer            (view-customer INDEX)");
+        System.out.println("17. Add Customer             (add-customer /n NAME /p PHONE /a ADDRESS)");
+        System.out.println("18. Delete Customer          (delete-customer INDEX)");
+        System.out.println("19. Update Customer          (update-customer INDEX /n NAME /p PHONE /a ADDRESS)");
+        System.out.println("20. List Customers           (list-customers)");
+        System.out.println("21. Find Customer            (find-customer KEYWORD)");
+        System.out.println("22. View Customer            (view-customer INDEX)");
+        System.out.println("--- Authentication ---");
+        System.out.println("23. Register                 (register USERNAME /p PASSWORD)");
+        System.out.println("24. Login                    (login USERNAME /p PASSWORD)");
+        System.out.println("25. Logout                   (logout)");
         System.out.println("--- General ---");
-        System.out.println("19. Viewing Help             (help)");
-        System.out.println("20. Exiting the Program      (exit)");
+        System.out.println("26. Viewing Help             (help)");
+        System.out.println("27. Exiting the Program      (exit)");
     }
 
     /**

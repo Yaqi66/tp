@@ -11,6 +11,8 @@ import java.util.ArrayList;
  * and various optional attributes for detailed tracking.
  */
 public class Medication {
+    public static final int DEFAULT_MINIMUM_STOCK_THRESHOLD = 20;
+
     // Compulsory attributes for a Medication.
     private String name;
     private String dosage;
@@ -26,6 +28,7 @@ public class Medication {
     private String route;
     private String maxDailyDose;
     private ArrayList<String> warnings;
+    private int minimumStockThreshold;
 
     /**
      * Constructs a {@code Medication} with the specified mandatory details.
@@ -52,6 +55,7 @@ public class Medication {
         this.route = "";
         this.maxDailyDose = "";
         this.warnings = new ArrayList<>();
+        this.minimumStockThreshold = DEFAULT_MINIMUM_STOCK_THRESHOLD;
     }
 
     public String getName() {
@@ -144,6 +148,17 @@ public class Medication {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public int getMinimumStockThreshold() {
+        return this.minimumStockThreshold;
+    }
+
+    public void setMinimumStockThreshold(int minimumStockThreshold) {
+        if (minimumStockThreshold <= 0) {
+            return;
+        }
+        this.minimumStockThreshold = minimumStockThreshold;
     }
 
     /**
