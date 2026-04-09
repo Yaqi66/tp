@@ -37,7 +37,8 @@ public class PasswordValidator {
         }
 
         if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
-            throw new PharmaTrackerException("Password must include uppercase, lowercase, number, and special character.");
+            throw new PharmaTrackerException(
+                "Password must include uppercase, lowercase, number, and special character.");
         }
     }
 }
