@@ -189,6 +189,17 @@ public class Storage {
         return list;
     }
 
+    /**
+     * Sanitizes raw data strings by replacing any occurrence of the storage
+     * delimiter with a safe space character.
+     * * This is a defensive measure to prevent data corruption. If a user
+     * includes the delimiter character (e.g., '|') in a medication name
+     * or warning, the {@link #load()} method would split the file line
+     * incorrectly.
+     *
+     * @param input The raw string to be saved to the text file.
+     * @return A cleaned version of the string, or an empty string if the input is null.
+     */
     private String sanitize(String input) {
         return input == null ? "" : input.replace(DELIMITER, " ");
     }
