@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 2
+
+actor User
+participant ":PharmaTracker" as PT
+participant ":Parser" as Parser
+participant "c:Command" as Cmd
+participant ":AuthService" as Auth
+participant ":Storage" as Storage
+participant ":Ui" as Ui
+
+User -> PT : run()
+PT -> Ui : readCommand()
+Ui --> PT : fullCommand
+PT -> Parser : parse(fullCommand)
+
+alt register USERNAME /p PASSWORD
+    Parser --> PT : new RegisterCommand(username, password)
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> Auth : register(username, password)
+    Auth --> Cmd : success / validation error
+    Cmd -> Ui : printMessage(result)
+else login USERNAME /p PASSWORD
+    Parser --> PT : new LoginCommand(username, password)
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> Auth : login(username, password)
+    Auth --> Cmd : success / validation error
+    Cmd -> Ui : printMessage(result)
+else logout
+    Parser --> PT : new LogoutCommand()
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> Auth : logout()
+    Cmd -> Ui : printMessage("Logged out successfully")
+end
+
+PT -> Storage : saveUsers(authService.getUsersSnapshot())
+PT -> Storage : saveSession(authService.getCurrentUsername())
+@enduml

@@ -24,6 +24,7 @@ PharmaTracker is a command-line application for pharmacy staff to manage medicat
 - Items in square brackets `[...]` are optional.
 - Parameters with a `/` prefix are flags (e.g. `/n NAME`).
 - INDEX refers to the 1-based position of an item as shown in the list/inventory.
+- Most commands require an authenticated session. Use `register` and `login` first.
 
 ---
 
@@ -501,6 +502,85 @@ Customer updated: [C001] Alice Tan | Phone: 81234567 | Address: 99 Clementi Ave
 
 ---
 
+## Authentication Commands
+
+### Register an account: `register`
+
+Creates a new user account.
+
+Format: `register USERNAME /p PASSWORD`
+
+- `USERNAME` must be non-empty.
+- `PASSWORD` must be non-empty and follow validation rules enforced by the app.
+
+Example:
+- `register pharmacist1 /p S3curePass!`
+
+---
+
+### Login: `login`
+
+Authenticates an existing user and starts a session.
+
+Format: `login USERNAME /p PASSWORD`
+
+Example:
+- `login pharmacist1 /p S3curePass!`
+
+---
+
+### Logout: `logout`
+
+Ends the current authenticated session.
+
+Format: `logout`
+
+---
+
+## Auto Restock Alert Commands
+
+### Set a medication threshold: `set-threshold`
+
+Sets a medication-specific minimum stock threshold used by the automatic restock alert system.
+
+Format: `set-threshold INDEX /threshold NUMBER`
+
+- `INDEX` must point to a valid medication.
+- `NUMBER` must be a positive integer.
+
+Examples:
+- `set-threshold 1 /threshold 30`
+- `set-threshold 3 /threshold 12`
+
+---
+
+### View active alerts: `alerts`
+
+Displays all currently active (unacknowledged) restock alerts.
+
+Format: `alerts`
+
+---
+
+### Acknowledge an alert: `ack-alert`
+
+Marks an active alert as acknowledged and removes it from the active list.
+
+Format: `ack-alert ALERT_INDEX`
+
+Example:
+- `ack-alert 2`
+
+---
+
+### View alert history: `alert-history`
+
+Displays persisted alert history, including active, acknowledged, and auto-resolved alerts.
+
+Format: `alert-history`
+
+---
+
 ## General Commands
 
 ### View help: `help`
@@ -557,5 +637,12 @@ A: PharmaTracker will display an error message and leave the inventory or custom
 | View customer       | `view-customer INDEX` |
 | Update customer     | `update-customer INDEX [/n NAME] [/p PHONE] [/a ADDRESS]` |
 | Delete customer     | `delete-customer INDEX`     |
+| Register            | `register USERNAME /p PASSWORD` |
+| Login               | `login USERNAME /p PASSWORD` |
+| Logout              | `logout` |
+| Set threshold       | `set-threshold INDEX /threshold NUMBER` |
+| View active alerts  | `alerts` |
+| Acknowledge alert   | `ack-alert ALERT_INDEX` |
+| Alert history       | `alert-history` |
 | Help                | `help` |
 | Exit                | `exit` |

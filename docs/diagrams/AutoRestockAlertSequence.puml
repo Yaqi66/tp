@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 2
+
+actor User
+participant ":PharmaTracker" as PT
+participant ":Parser" as Parser
+participant "c:Command" as Cmd
+participant ":Inventory" as Inv
+participant "med:Medication" as Med
+participant ":RestockAlertService" as AlertService
+participant ":Storage" as Storage
+participant ":Ui" as Ui
+
+User -> PT : run()
+PT -> Ui : readCommand()
+Ui --> PT : fullCommand
+PT -> Parser : parse(fullCommand)
+
+alt set-threshold INDEX /threshold NUMBER
+    Parser --> PT : new SetThresholdCommand(index, threshold)
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> Inv : getMedication(index - 1)
+    Inv --> Cmd : medication
+    Cmd -> Med : setMinimumStockThreshold(threshold)
+    Cmd -> Ui : printMessage("Updated minimum stock threshold...")
+else alerts
+    Parser --> PT : new AlertsCommand()
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> AlertService : getActiveAlerts()
+    AlertService --> Cmd : activeAlerts
+    Cmd -> Ui : printActiveAlerts(activeAlerts)
+else ack-alert ALERT_INDEX
+    Parser --> PT : new AcknowledgeAlertCommand(index)
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> AlertService : acknowledgeActiveAlert(index)
+    AlertService --> Cmd : acknowledged / null
+    alt valid alert index
+        Cmd -> Ui : printMessage("Acknowledged alert...")
+    else invalid alert index
+        Cmd -> Ui : printMessage("Invalid alert index...")
+    end
+else alert-history
+    Parser --> PT : new AlertHistoryCommand()
+    PT -> Cmd : execute(inventory, ui, customerList)
+    Cmd -> AlertService : getAlertHistory()
+    AlertService --> Cmd : history
+    Cmd -> Ui : printAlertHistory(history)
+end
+
+PT -> AlertService : evaluateInventory(inventory)
+PT -> Storage : saveAlertHistory(alertService.getAlertHistory())
+@enduml

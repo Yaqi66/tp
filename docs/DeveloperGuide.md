@@ -31,6 +31,8 @@ The key components of the system are outlined below.
 | `Command` (abstract) | Defines the required `execute()` contract. Concrete command classes (e.g., `AddCommand`, `DispenseCommand`) implement this to interact with the application's data. |
 | `Inventory`          | The in-memory data structure that stores and manages all `Medication` records.                                                                                      |
 | `CustomerList`       | The in-memory data structure that manages registered `Customer` profiles and their dispensing histories.                                                            |
+| `AuthService`        | Manages user registration/login/logout, password verification, and current session state.                                                                            |
+| `RestockAlertService`| Evaluates stock against medication thresholds, tracks active alerts, and maintains alert history.                                                                    |
 | `Storage`            | Handles the serialization and deserialization of data to a local text file (`data/pharmatracker.txt`) to ensure data persistence across sessions.                   |
 | `Ui`                 | Manages all interactions with the user, including reading terminal inputs and printing formatted outputs to the console.                                            |
 
@@ -695,6 +697,78 @@ The following sequence diagrams show the two flows of the dispense log feature.
 
 ---
 
+### User Authentication Feature
+
+PharmaTracker includes account-based access control so users must authenticate before executing
+most commands.
+
+```
+register USERNAME /p PASSWORD
+login USERNAME /p PASSWORD
+logout
+```
+
+#### How it works
+
+1. On startup, `PharmaTracker()` loads persisted users and previous session state from `Storage`.
+2. `AuthService` is initialized and registered in `AppServices` for command access.
+3. During command loop execution, `PharmaTracker.run()` checks:
+   - If `command.requiresAuthentication()` is `true` and there is no active session,
+     execution is blocked with an authentication-required message.
+4. `RegisterCommand` and `LoginCommand` parse `USERNAME /p PASSWORD` and call
+   `AuthService.register()` / `AuthService.login()`.
+5. `LogoutCommand` clears the active session via `AuthService.logout()`.
+6. After each command cycle, users and session are persisted with
+   `storage.saveUsers(...)` and `storage.saveSession(...)`.
+
+#### Design Considerations
+
+| Aspect | Choice | Reason |
+|--------|--------|--------|
+| Auth enforcement point | `PharmaTracker.run()` gate using `requiresAuthentication()` | Centralized enforcement avoids duplicated checks in every command class |
+| Default command auth policy | `Command.requiresAuthentication()` returns `true` | Secure-by-default; only selected commands override to allow unauthenticated usage |
+| Session persistence | Save current username after each command | Supports session restoration and avoids forcing login after every restart |
+
+---
+
+### Auto Restock Alerts Feature
+
+The system automatically monitors inventory stock levels against per-medication thresholds and
+surfaces actionable restock alerts.
+
+```
+set-threshold INDEX /threshold NUMBER
+alerts
+ack-alert ALERT_INDEX
+alert-history
+```
+
+#### How it works
+
+1. Every medication has `minimumStockThreshold`, initialized to a default value.
+2. Users can override it with `SetThresholdCommand` using
+   `set-threshold INDEX /threshold NUMBER`.
+3. `PharmaTracker.run()` calls `restockAlertService.evaluateInventory(inventory)`:
+   - On startup.
+   - After every command except `logout`.
+4. `RestockAlertService` compares each medication's quantity against threshold:
+   - If `quantity < threshold`, an active alert is created/updated.
+   - If stock recovers above threshold, existing active alert is auto-resolved.
+5. `alerts` prints currently active alerts.
+6. `ack-alert ALERT_INDEX` acknowledges one active alert by display index.
+7. `alert-history` shows full persisted alert history.
+8. Alert history is saved via `storage.saveAlertHistory(...)` each cycle.
+
+#### Design Considerations
+
+| Aspect | Choice | Reason |
+|--------|--------|--------|
+| Per-medication threshold | Stored on `Medication` | Flexible and realistic; different medications can have different reorder points |
+| Active + history model | Active map plus append-only history list | Enables operational view (`alerts`) and audit trail (`alert-history`) |
+| Automatic evaluation in main loop | Re-evaluate after command execution | Keeps alerts up-to-date without requiring users to trigger a separate scan command |
+
+---
+
 ### Management of Customers
 
 This foundational data layer serves as the storage and management backbone for all patient-centric features.
@@ -752,6 +826,8 @@ Fast, lightweight medication tracking without needing a database or internet con
 | v2.0    | pharmacist          | update a customer's details            | keep customer records current and accurate         |
 | v2.0    | pharmacist          | check which medications are low stock  | reorder before supplies run out                    |
 | v2.0.1    | pharmacist          | view a daily dispense log              | review or audit all dispensing events for any date |
+| v2.1    | pharmacist          | register and login                     | protect sensitive inventory and customer workflows |
+| v2.1    | pharmacist          | configure restock thresholds and review alerts | proactively restock medications before stockouts |
 
 ## Non-Functional Requirements
 
