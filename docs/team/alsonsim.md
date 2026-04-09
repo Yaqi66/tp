@@ -21,7 +21,7 @@ fast typists who prefer a CLI workflow over GUI applications.
 
 #### 1. Dispense with Customer Linking (`dispense`)
 
-Extended the existing `dispense` command with an optional `c/CUSTOMER_INDEX` flag. When provided, the dispensed medication is automatically recorded in that customer's dispensing history. If omitted, the command behaves identically to the original.
+Extended the existing `dispense` command with an optional `/c CUSTOMER_INDEX` flag. When provided, the dispensed medication is automatically recorded in that customer's dispensing history. If omitted, the command behaves identically to the original.
 
 **Technical Implementation:**
 - Added an overloaded constructor to `DispenseCommand` using a sentinel value (`NO_CUSTOMER = -1`) to distinguish linked and unlinked dispenses without nullable primitives or autoboxing overhead.
@@ -158,13 +158,13 @@ The `restock` command **additively** increases the stock of an existing medicati
 
 ### Dispense with Customer Linking Feature
 
-Extends the existing `dispense` command with an optional `c/CUSTOMER_INDEX` flag. When the flag is provided, the dispensed medication is recorded in that customer's dispensing history. Omitting `c/` retains the original behaviour exactly.
+Extends the existing `dispense` command with an optional `/c CUSTOMER_INDEX` flag. When the flag is provided, the dispensed medication is recorded in that customer's dispensing history. Omitting `/c` retains the original behaviour exactly.
 
-**Format:** `dispense INDEX q/QUANTITY [c/CUSTOMER_INDEX]`
+**Format:** `dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]`
 
 #### How it works
 
-1. The user enters `dispense 1 q/20 c/1`.
+1. The user enters `dispense 1 q/20 /c 1`.
 2. `Parser.parse()` extracts the medication index, `q/` quantity, and optional `c/` customer index.
 3. A `DispenseCommand` is constructed via the 3-arg constructor; the 2-arg constructor delegates to it with `NO_CUSTOMER = -1`.
 4. `execute()` validates medication index → stock sufficiency → customer index, in that order. No state is modified until all three pass.
@@ -290,12 +290,12 @@ Medication: Amoxicillin | Added: 100 units | Updated Stock: 120 units.
 
 Reduces the stock of a medication by the specified quantity. Optionally links the dispense event to a registered customer, recording it in their dispensing history.
 
-**Format:** `dispense INDEX q/QUANTITY [c/CUSTOMER_INDEX]`
+**Format:** `dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]`
 
 **Behaviour:**
 - Dispensing fails if the requested quantity exceeds current stock.
-- `c/CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
-- If `c/CUSTOMER_INDEX` is out of range, an error is shown and stock is unchanged.
+- `/c CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
+- If `/c CUSTOMER_INDEX` is out of range, an error is shown and stock is unchanged.
 
 **Example without customer linking:**
 
@@ -310,7 +310,7 @@ Updated Stock: 40 units
 
 **Example with customer linking:**
 
-Command: `dispense 1 q/20 c/1`
+Command: `dispense 1 q/20 /c 1`
 
 ```text
 Dispensing successfully!

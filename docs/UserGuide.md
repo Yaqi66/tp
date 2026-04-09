@@ -161,13 +161,13 @@ WARNINGS & PRECAUTIONS
 Reduces the stock of a medication by the specified quantity. Optionally links the
 dispense event to a registered customer — when a customer index is provided, the
 dispensed medication is automatically recorded in that customer's dispensing
-history. If `c/CUSTOMER_INDEX` is omitted, the command behaves exactly as before.
+history. If `/c CUSTOMER_INDEX` is omitted, the command behaves exactly as before.
 
-**Format**: `dispense INDEX q/QUANTITY [c/CUSTOMER_INDEX]`
+**Format**: `dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]`
 
 - Dispensing fails if the requested quantity exceeds the current stock.
-- `c/CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
-- If `c/CUSTOMER_INDEX` is provided but out of range, an error is shown and
+- `/c CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
+- If `/c CUSTOMER_INDEX` is provided but out of range, an error is shown and
   stock remains unchanged.
 
 **Example — no customer linked:**
@@ -183,7 +183,7 @@ Updated Stock: 40 units
 
 **Example — linked to customer:**
 
-`dispense 1 q/20 c/1`
+`dispense 1 q/20 /c 1`
 
 ```
 Dispensing successfully!
@@ -545,7 +545,7 @@ A: PharmaTracker will display an error message and leave the inventory or custom
 | Find medication     | `find KEYWORD` |
 | View medication     | `view INDEX` |
 | Delete medication   | `delete INDEX` |
-| Dispense medication | `dispense INDEX q/QUANTITY [c/CUSTOMER_INDEX]` |
+| Dispense medication | `dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]` |
 | Restock medication  | `restock INDEX /q QUANTITY` |
 | Sort by expiry      | `sort` |
 | Check expiring      | `expiring [/days DAYS]` |

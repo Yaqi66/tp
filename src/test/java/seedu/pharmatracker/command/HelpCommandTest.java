@@ -83,7 +83,7 @@ public class HelpCommandTest {
             () -> assertTrue(output.contains("/n NAME")),
             () -> assertTrue(output.contains("delete INDEX")),
             () -> assertTrue(output.contains("dispense INDEX q/QUANTITY")),
-            () -> assertTrue(output.contains("c/CUSTOMER_INDEX")),
+            () -> assertTrue(output.contains("/c CUSTOMER_INDEX")),
             () -> assertTrue(output.contains("find KEYWORD")),
             () -> assertTrue(output.contains("view INDEX")),
             () -> assertTrue(output.contains("add-customer /n NAME /p PHONE")),

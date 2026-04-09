@@ -357,22 +357,22 @@ The following sequence diagram shows the full execution flow of the `restock` co
 
 ### Dispense with Customer Linking Feature
 
-Extends the existing `dispense` command with an optional `c/CUSTOMER_INDEX` flag. When the
+Extends the existing `dispense` command with an optional `/c CUSTOMER_INDEX` flag. When the
 flag is provided, the dispensed medication is recorded in that customer's dispensing history.
-Omitting `c/` retains the original behaviour exactly — no customer data is read or written.
+Omitting `/c` retains the original behaviour exactly — no customer data is read or written.
 
 ```
-dispense INDEX q/QUANTITY [c/CUSTOMER_INDEX]
+dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]
 ```
 
 #### How it works
 
-1. The user enters `dispense 1 q/20 c/1` (or `dispense 1 q/20` without customer linking).
+1. The user enters `dispense 1 q/20 /c 1` (or `dispense 1 q/20` without customer linking).
 2. `PharmaTracker.run()` passes the raw string to `Parser.parse()`.
 3. `Parser.parse()` identifies the command word `dispense`, then:
    - Extracts the medication index from the leading portion of the description.
    - Locates the `q/` flag and parses the quantity.
-   - Checks for the optional `c/` flag. If present, its value is parsed as an integer
+    - Checks for the optional `/c` flag. If present, its value is parsed as an integer
      `customerIndex`; if absent, the two-argument constructor is used, which internally
      sets `customerIndex` to the sentinel value `NO_CUSTOMER` (-1).
 4. A `DispenseCommand` object is constructed via the appropriate constructor.
@@ -802,10 +802,10 @@ Fast, lightweight medication tracking without needing a database or internet con
 
 ### Dispensing with customer linking
 
-1. Enter: `dispense 1 q/20 c/1`
+1. Enter: `dispense 1 q/20 /c 1`
 2. **Expected:** Stock reduced by 20, confirmation includes customer ID and name.
 3. Without customer: `dispense 1 q/20` → behaves as original, no customer info in output.
-4. Invalid customer index: `dispense 1 q/20 c/99` → error message for out-of-bounds customer index.
+4. Invalid customer index: `dispense 1 q/20 /c 99` → error message for out-of-bounds customer index.
 
 ### Updating a customer
 
@@ -828,6 +828,6 @@ Fast, lightweight medication tracking without needing a database or internet con
 1. Dispense some medications first: `dispense 1 q/5` and `dispense 2 q/3`.
 2. Enter: `dispenselog`
 3. **Expected:** A log showing today's date, one entry per dispense event with time, medication name, dosage, quantity, and patient name (if linked). A totals line at the bottom shows event count and total units.
-4. With a patient: `dispense 1 q/2 c/1` then `dispenselog` → the patient's name appears on that entry.
+4. With a patient: `dispense 1 q/2 /c 1` then `dispenselog` → the patient's name appears on that entry.
 5. Specific past date: `dispenselog /date 2026-01-01` → `No dispense events recorded for 2026-01-01.` (assuming no events on that date).
 6. Invalid date format: `dispenselog /date 09-04-2026` → error message asking for `YYYY-MM-DD` format.
