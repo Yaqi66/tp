@@ -134,7 +134,6 @@ public class Storage {
 
     /**
      * Saves the current list of customers and their dispensing histories to a text file.
-     * History entries are joined using a semicolon (;) to handle multiple medications.
      *
      * @param customerList The manager containing the customers to save.
      */
@@ -144,7 +143,6 @@ public class Storage {
             java.io.File file = new java.io.File(CUSTOMER_FILE_PATH);
             file.getParentFile().mkdirs();
             java.io.FileWriter fw = new java.io.FileWriter(file);
-
             for (int i = 0; i < customerList.size(); i++) {
                 seedu.pharmatracker.customer.Customer c = customerList.getCustomer(i);
                 String joinedHistory = String.join(HISTORY_SEPARATOR, c.getDispensingHistory());
@@ -162,7 +160,6 @@ public class Storage {
 
     /**
      * Loads customer data from the local text file.
-     * Correctly reconstructs the dispensing history for customers with multiple records.
      *
      * @return A CustomerList populated with data from the file.
      */
@@ -339,44 +336,6 @@ public class Storage {
         try {
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()) {
-     * Saves all dispense records to the dispense log file.
-     * Each record is written as one pipe-delimited line.
-     *
-     * @param dispenseLog The dispense log to persist.
-     */
-    public void saveDispenseLog(DispenseLog dispenseLog) {
-        assert dispenseLog != null : "DispenseLog should not be null";
-        try {
-            File file = new File(DISPENSE_LOG_FILE_PATH);
-            file.getParentFile().mkdirs();
-            FileWriter fw = new FileWriter(file);
-            for (DispenseRecord record : dispenseLog.getAllRecords()) {
-                fw.write(record.toStorageString() + "\n");
-            }
-            fw.close();
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error saving dispense log: {0}", e.getMessage());
-            System.out.println("Error saving dispense log: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Loads the dispense log from the dispense log file.
-     * Returns an empty {@link DispenseLog} if the file does not exist or is unreadable.
-     *
-     * @return A {@link DispenseLog} populated from the saved file.
-     */
-    public DispenseLog loadDispenseLog() {
-        DispenseLog log = new DispenseLog();
-        File file = new File(DISPENSE_LOG_FILE_PATH);
-        if (!file.exists()) {
-            return log;
-        }
-        try {
-            Scanner sc = new Scanner(file);
-            int lineNumber = 0;
-            while (sc.hasNextLine()) {
-                lineNumber++;
                 String line = sc.nextLine().trim();
                 if (line.isEmpty()) {
                     continue;
@@ -406,6 +365,50 @@ public class Storage {
             System.out.println("Error loading alert history: " + e.getMessage());
         }
         return alertHistory;
+    }
+
+    /**
+     * Saves all dispense records to the dispense log file.
+     * Each record is written as one pipe-delimited line.
+     *
+     * @param dispenseLog The dispense log to persist.
+     */
+    public void saveDispenseLog(DispenseLog dispenseLog) {
+        assert dispenseLog != null : "DispenseLog should not be null";
+        try {
+            File file = new File(DISPENSE_LOG_FILE_PATH);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);
+            for (DispenseRecord record : dispenseLog.getAllRecords()) {
+                fw.write(record.toStorageString() + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error saving dispense log: {0}", e.getMessage());
+            System.out.println("Error saving dispense log: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads the dispense log from the dispense log file.
+     *
+     * @return A DispenseLog populated from the saved file.
+     */
+    public DispenseLog loadDispenseLog() {
+        DispenseLog log = new DispenseLog();
+        File file = new File(DISPENSE_LOG_FILE_PATH);
+        if (!file.exists()) {
+            return log;
+        }
+        try {
+            Scanner sc = new Scanner(file);
+            int lineNumber = 0;
+            while (sc.hasNextLine()) {
+                lineNumber++;
+                String line = sc.nextLine().trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
                 DispenseRecord record = DispenseRecord.fromStorageString(line);
                 if (record == null) {
                     logger.log(Level.WARNING, "Skipping malformed dispense log line {0}: {1}",
@@ -420,68 +423,5 @@ public class Storage {
             System.out.println("Error loading dispense log: " + e.getMessage());
         }
         return log;
-    }
-
-    /**
-     * Saves all dispense records to the dispense log file.
-     * Each record is written as one pipe-delimited line.
-     *
-     * @param dispenseLog The dispense log to persist.
-     */
-    public void saveDispenseLog(seedu.pharmatracker.dispense.DispenseLog dispenseLog) {
-        if (dispenseLog == null) {
-            return;
-        }
-        try {
-            File file = new File(DISPENSE_LOG_FILE_PATH);
-            file.getParentFile().mkdirs();
-            FileWriter fw = new FileWriter(file);
-            for (seedu.pharmatracker.dispense.DispenseRecord record : dispenseLog.getRecords()) {
-                fw.write(record.getMedicationName() + DELIMITER
-                        + record.getQuantity() + DELIMITER
-                        + record.getCustomerId() + DELIMITER
-                        + record.getTimestamp() + "\n");
-            }
-            fw.close();
-        } catch (IOException e) {
-            System.out.println("Error saving dispense log: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Loads dispense records from the dispense log file.
-     *
-     * @return A DispenseLog populated with persisted records.
-     */
-    public seedu.pharmatracker.dispense.DispenseLog loadDispenseLog() {
-        seedu.pharmatracker.dispense.DispenseLog dispenseLog =
-                new seedu.pharmatracker.dispense.DispenseLog();
-        File file = new File(DISPENSE_LOG_FILE_PATH);
-        if (!file.exists()) {
-            return dispenseLog;
-        }
-        try {
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine().trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
-                String[] parts = line.split("\\|", -1);
-                if (parts.length < 4) {
-                    continue;
-                }
-                dispenseLog.addRecord(new seedu.pharmatracker.dispense.DispenseRecord(
-                        parts[0],
-                        Integer.parseInt(parts[1]),
-                        parts[2],
-                        parts[3]
-                ));
-            }
-            sc.close();
-        } catch (Exception e) {
-            System.out.println("Error loading dispense log: " + e.getMessage());
-        }
-        return dispenseLog;
     }
 }
