@@ -1,11 +1,9 @@
 # User Guide
 
 ## Introduction
-
 PharmaTracker is a command-line application for pharmacy staff to manage medication inventory and customer records. It supports adding, finding, dispensing, and restocking medications, as well as managing customer information and tracking dispensing history.
 
 ## Quick Start
-
 1. Ensure Java 17 or above is installed on your computer.
 2. Download the latest `pharmatracker.jar` from the releases page.
 3. Open a terminal in the folder containing the jar file.
@@ -17,9 +15,7 @@ PharmaTracker is a command-line application for pharmacy staff to manage medicat
 ---
 
 ## Features
-
 ### Notes on command format
-
 - Words in `UPPER_CASE` are parameters to be supplied by the user.
 - Items in square brackets `[...]` are optional.
 - Parameters with a `/` prefix are flags (e.g. `/n NAME`).
@@ -30,7 +26,6 @@ PharmaTracker is a command-line application for pharmacy staff to manage medicat
 ## Medication Commands
 
 ### Add a medication: `add`
-
 Adds a new medication to the inventory.
 
 **Format:** `add /n NAME /d DOSAGE /q QUANTITY /e EXPIRY [/t TAG] [/df DOSAGE_FORM] [/mfr MANUFACTURER] [/dir DIRECTIONS] [/freq FREQUENCY] [/route ROUTE] [/max MAX_DAILY_DOSE] [/warn WARNING]`
@@ -39,7 +34,7 @@ Adds a new medication to the inventory.
 * `/n NAME`: The name of the medication. 
 * `/d DOSAGE`: The strength or dosage (e.g., 500mg).
 * `/q QUANTITY`: The number of units in stock. **Must be a positive integer**.
-* `/e EXPIRY`: The expiration date. **Must be in `DD/MM/YYYY` format**.
+* `/e EXPIRY`: The expiration date. **Must be in `DD/MM/YYYY` or `DD-MM-YYYY` or `YYYY-MM-DD` format**.
 
 **Optional Parameters:**
 * `/t TAG`: A category to group the medication (e.g., `antibiotic`, `painkiller`).
@@ -56,6 +51,15 @@ Adds a new medication to the inventory.
 * `add /n Amoxicillin /d 250mg /q 50 /e 01/06/2026 /t antibiotic /df Capsule /mfr Pfizer /warn May cause allergic reactions`
 * `add /n Cough Syrup /d 15mg/5ml /q 20 /e 15/10/2025 /df Syrup /dir Shake well before use /freq Every 6 hours /route Oral`
 
+**Expected Output:**
+
+```
+____________________________________________________________
+You have added the following medication:
+  Name: Paracetamol | Dosage: 500mg | Qty: 100 | Exp: 2026-12-31 | Tag: painkiller
+You now have 4 medications in your inventory!
+____________________________________________________________
+```
 ---
 
 ### Delete a medication: `delete`
@@ -351,6 +355,7 @@ Registers a new customer into the pharmacy's database.
 * `add-customer /id C002 /n Jane Smith /p 91234567 /a 123 Clementi Road, #04-56`
 
 ---
+
 ### Delete a customer: `delete-customer`
 
 Removes an existing customer from the pharmacy's database.
@@ -367,7 +372,7 @@ Removes an existing customer from the pharmacy's database.
 
 ---
 
-## List all customers: `list-customers`
+### List all customers: `list-customers`
 
 Displays a numbered list of all customers currently registered in the system,
 showing their customer ID, name, and phone number.
