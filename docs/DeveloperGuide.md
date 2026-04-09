@@ -16,9 +16,13 @@
     - [View Medication Feature](#view-medication-feature)
     - [Update Medication Feature](#update-medication-feature)
     - [List Medication Feature](#list-medication-feature)
+    - [Add Customers Feature](#add-customer-feature)
+    - [Delete Customers Feature](#delete-customer-feature)
     - [List Customers Feature](#list-customers-feature)
     - [Restock Medication Feature](#restock-medication-feature)
     - [Dispense with Customer Linking Feature](#dispense-with-customer-linking-feature)
+    - [Allergy Check Feature](#allergy-check-feature)
+    - [Find Customer Feature](#find-customer-feature)
     - [View Customer Feature](#view-customer-feature)
     - [Update Customer Feature](#update-customer-feature)
     - [Sort Medication Feature](#sort-medication-feature)
@@ -108,7 +112,8 @@ The `Command` component follows the Command pattern. Every command implements th
 The `Storage` component handles the persistence of both medications and patient records.
 * **Medication Data**: Serialized to `data/pharmatracker.txt`.
 * **Customer Data**: Serialized to `data/customers.txt`.
-  The system uses a pipe-delimited format for high-level attributes. For patient dispensing history, which can contain multiple entries, the data is collapsed into a single string segment using a semicolon separator (`;`) to prevent line-break corruption in the text file.
+  
+The system uses a pipe-delimited format for high-level attributes. For patient dispensing history, which can contain multiple entries, the data is collapsed into a single string segment using a semicolon separator (`;`) to prevent line-break corruption in the text file. Customer allergies are stored as a comma-separated string in the sixth column (e.g. `penicillin,aspirin`). Files saved before the allergy feature was introduced contain only five columns and load cleanly with an empty allergy list, ensuring backward compatibility.
 
 ### UI Component
 
@@ -471,6 +476,9 @@ dispense INDEX q/QUANTITY [/c CUSTOMER_INDEX]
    - If the quantity exceeds current stock, an error is printed and the command returns early.
    - If `customerIndex != NO_CUSTOMER` and the customer index is out of range, an error is
      printed and the command returns early. Stock is **not** decremented in this case.
+   - If `customerIndex != NO_CUSTOMER` and the linked customer has a recorded allergy that
+     matches the medication name (case-insensitive substring match), `Ui.printAllergyWarning()`
+     is called and the command returns early. Stock is **not** decremented.
 6. All validations passed: `medication.setQuantity(medication.getQuantity() - quantity)`
    decrements the stock.
 7. If `customerIndex != NO_CUSTOMER`, `CustomerList.getCustomer(customerIndex - 1)` retrieves
@@ -491,8 +499,55 @@ linking. The `[c/ flag present]` alt branch is only entered when a customer inde
 | Optional `c/` flag vs a separate command | Optional flag on existing command | Avoids duplicating stock-decrement logic; fully backward compatible — existing calls without `c/` are unaffected |
 | Sentinel value `NO_CUSTOMER = -1` | Sentinel (`int`) over `Integer` / `null` | Avoids autoboxing and null-pointer risk on a primitive field; the sentinel is a named constant and self-documenting |
 | Customer index validated **before** stock decrement | Pre-decrement guard | Prevents a state where stock is already reduced but the customer record write then fails |
+| Allergy check positioned **after** customer index validation, **before** stock decrement | Pre-decrement guard | Ensures stock is never modified when dispensing is blocked by an allergy conflict |
+| Allergy matching via case-insensitive substring (`contains`) | Substring match | A stored allergen of `penicillin` correctly blocks `Penicillin V 500mg`; exact-match would be too brittle for real medication names |
 | Dispensing record stored on `Customer`, not `Medication` | `Customer` | The natural query is "what has this customer received?"; storing on `Medication` would require scanning every medication to reconstruct a customer's history |
 | Two constructors (2-arg and 3-arg) | Overloaded constructors | Keeps call sites for the no-customer case clean; the 2-arg constructor delegates to the 3-arg one via `this(index, quantity, NO_CUSTOMER)` |
+
+---
+
+---
+
+### Allergy Check Feature
+
+The allergy check is an automatic safety guard built into the `dispense` command. When a dispense
+is linked to a customer via `/c`, the system checks the customer's recorded allergens against the
+medication name before any stock is modified. If a match is found, dispensing is aborted.
+
+#### How it works
+
+The feature spans three layers:
+
+**Model (`Customer.java`)**
+- Each `Customer` holds an `ArrayList<String> allergies`, initialized to an empty list.
+- `addAllergy(String)` normalises input to lowercase and trims whitespace before storing.
+- `isAllergicTo(String medicationName)` performs a case-insensitive substring check: for each
+  stored allergen, it checks whether `medicationName.toLowerCase().contains(allergen)`.
+- `getMatchedAllergen(String medicationName)` returns the first allergen keyword that triggered
+  the match, used to produce a precise warning message.
+
+**Parser (`CustomerParserUtil.java`)**
+- `FLAG_ALLERGY = "/allergy"` is defined as a named constant.
+- `extractCustomerAllergies(String description)` splits the comma-separated value after the
+  `/allergy` flag and returns an `ArrayList<String>`. Returns an empty list if the flag is absent.
+- `FLAG_ADDRESS` was renamed from `/a` to `/address` to eliminate an ambiguity: `/a` is a
+  prefix of `/allergy`, causing `indexOf("/a")` to falsely match inside `/allergy`. Using
+  `/address` removes the collision entirely.
+
+**Command (`DispenseCommand.java`)**
+- The allergy check is performed after all index and stock validations, but before
+  `performDispense()` is called — ensuring stock is never decremented on a blocked dispense.
+- The check is only performed when `isCustomerLinked()` is true.
+
+#### Design Considerations
+
+| Aspect | Choice | Reason |
+|--------|--------|--------|
+| Substring match over exact match | `contains()` | Medication names often include strength and form (e.g. `Penicillin V 500mg Tablet`); exact match on `penicillin` would fail to block it |
+| Allergens stored lowercase | `toLowerCase()` on input | Normalises at write time; comparison is then a simple `contains()` with no extra lowercasing at read time |
+| `/a` renamed to `/address` | Flag rename | Eliminates prefix collision with `/allergy` without requiring fragile character-lookahead logic |
+| Allergy check aborts silently (no partial execution) | Hard abort | Partial execution — e.g. stock decremented but record not written — would leave the system in an inconsistent state |
+| `setAllergies()` replaces rather than appends | Full replacement | Supports corrections; staff can re-declare the full list to remove a previously recorded allergen |
 
 ---
 
@@ -582,7 +637,7 @@ The following sequence diagram shows the full execution flow of the `view-custom
 The `update-customer` command allows pharmacy staff to update one or more fields of an existing customer record.
 Only the fields explicitly provided are changed; all other fields remain unchanged.
 ```
-update-customer INDEX [/n NAME] [/p PHONE] [/a ADDRESS]
+update-customer INDEX [/n NAME] [/p PHONE] [/address ADDRESS] [/allergy ALLERGY1,ALLERGY2,...]
 ```
 
 #### How it works
@@ -590,10 +645,10 @@ update-customer INDEX [/n NAME] [/p PHONE] [/a ADDRESS]
 1. The user enters `update-customer 1 /n Alice /p 91234567 /a 123 Main St`.
 2. `PharmaTracker.run()` passes the input to `Parser.parse()`.
 3. `Parser.parse()` identifies the command word `update-customer`.
-4. The parser splits the description into the 1-based index and a trailing argument string. It then calls `extractCustomerUpdateFlag()` for each of the `/n`, `/p`, and `/a` flags. Flags that are absent return `null`.
-5. An `UpdateCustomerCommand` is constructed with the index and the three (nullable) field values.
-6. `UpdateCustomerCommand.execute()` validates the index against `CustomerList.size()`. If no flags were supplied (all three are `null`), it prints an error and returns early.
-7. For each non-null field, the corresponding setter (`customer.setName()`, `customer.setPhone()`, `customer.setAddress()`) is called on the retrieved `Customer` object.
+4. The parser splits the description into the 1-based index and a trailing argument string. It then calls `extractCustomerUpdateFlag()` for each of the `/n`, `/p`, and `/address` flags. Flags that are absent return `null`. If the `/allergy` flag is present, `CustomerParserUtil.extractCustomerAllergies()` parses the comma-separated value into an `ArrayList<String>`; if absent, `null` is passed, leaving the existing allergy list unchanged.
+5. An `UpdateCustomerCommand` is constructed with the index and the four (nullable) field values.
+6. `UpdateCustomerCommand.execute()` validates the index against `CustomerList.size()`. If no flags were supplied (all four are `null`), it prints an error and returns early.
+7. For each non-null field, the corresponding setter (`customer.setName()`, `customer.setPhone()`, `customer.setAddress()`, `customer.setAllergies()`) is called on the retrieved `Customer` object.
 8. `Ui.printUpdatedCustomerMessage(customer)` confirms the update to the user.
 
 The following sequence diagram shows the full execution flow of the `update-customer` command:
@@ -607,6 +662,7 @@ The following sequence diagram shows the full execution flow of the `update-cust
 | `null` for absent flags | Yes | Cleanly distinguishes "not provided" from an empty string; avoids silent overwrites |
 | Partial update vs full replacement | Partial | Users should not have to re-enter unchanged fields |
 | Validation location | `execute()`, not `Parser` | Keeps parser stateless; index validity requires live `CustomerList` size |
+| `/allergy` replaces the full list, not appends | Full replacement | Simpler mental model — staff explicitly state the complete current allergy list rather than tracking incremental adds and removes |
 
 ---
 

@@ -1,5 +1,6 @@
 @startuml
 skinparam ArrowFontStyle plain
+skinparam maxMessageSize 100
 
 actor User
 participant ":PharmaTracker" as PharmaTracker
@@ -8,10 +9,10 @@ participant ":Ui" as Ui
 participant ":Storage" as Storage
 participant ":Inventory" as Inventory
 participant ":CustomerList" as CustomerList
-participant "<<class>>\nParser" as Parser
+participant "<<class>>\nPharmaTrackerParser" as PTP
 participant "c:Command" as Command
 
-User -> PharmaTracker : launch app
+User -> PharmaTracker : launch app (main)
 activate PharmaTracker
 
 PharmaTracker -> LoggerSetup : init()
@@ -36,16 +37,20 @@ activate Storage
 create Inventory
 Storage -> Inventory : new Inventory()
 activate Inventory
-Inventory --> Storage
+Inventory --> Storage : inventory
 deactivate Inventory
 Storage --> PharmaTracker : inventory
 deactivate Storage
 
+PharmaTracker -> Storage : loadCustomers()
+activate Storage
 create CustomerList
-PharmaTracker -> CustomerList : new CustomerList()
+Storage -> CustomerList : new CustomerList()
 activate CustomerList
-CustomerList --> PharmaTracker
+CustomerList --> Storage : customerList
 deactivate CustomerList
+Storage --> PharmaTracker : customerList
+deactivate Storage
 
 PharmaTracker -> Ui : printWelcomeMessage()
 activate Ui
@@ -59,17 +64,17 @@ loop continuous execution loop
     Ui --> PharmaTracker : fullCommand
     deactivate Ui
 
-    PharmaTracker -> Parser : parse(fullCommand)
-    activate Parser
+    PharmaTracker -> PTP : parse(fullCommand)
+    activate PTP
 
     create Command
-    Parser -> Command : instantiate specific command
+    PTP -> Command : instantiate specific command
     activate Command
-    Command --> Parser : c
+    Command --> PTP : c
     deactivate Command
 
-    Parser --> PharmaTracker : c
-    deactivate Parser
+    PTP --> PharmaTracker : c
+    deactivate PTP
 
     PharmaTracker -> Command : execute(inventory, ui, customerList)
     activate Command
@@ -83,6 +88,11 @@ loop continuous execution loop
     deactivate Command
 
     PharmaTracker -> Storage : save(inventory)
+    activate Storage
+    Storage --> PharmaTracker
+    deactivate Storage
+
+    PharmaTracker -> Storage : saveCustomers(customerList)
     activate Storage
     Storage --> PharmaTracker
     deactivate Storage

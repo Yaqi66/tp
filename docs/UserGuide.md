@@ -226,6 +226,8 @@ history. If `/c CUSTOMER_INDEX` is omitted, the command behaves exactly as befor
 - `/c CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
 - If `/c CUSTOMER_INDEX` is provided but out of range, an error is shown and
   stock remains unchanged.
+- If the linked customer has a recorded allergy that matches the medication name,
+  **dispensing is aborted** and a warning is shown. Stock is not decremented.
 
 **Example — no customer linked:**
 
@@ -248,6 +250,16 @@ Medication: Paracetamol
 Amount: 20 units
 Updated Stock: 110 units
 Recorded for customer: [C001] John Tan.
+```
+
+**Example — allergy conflict detected:**
+
+`dispense 1 q/5 /c 1` *(where customer C001 is allergic to penicillin and medication 1 is Penicillin V)*
+
+```
+WARNING: Allergy conflict detected!
+Customer "Alice Tan" has a recorded allergy to "penicillin".
+Dispense aborted. Please verify with a pharmacist before proceeding.
 ```
 
 ---
@@ -438,7 +450,7 @@ No dispense events recorded for 2026-04-09.
 
 Registers a new customer into the pharmacy's database.
 
-**Format:** `add-customer /id CUSTOMER_ID /n NAME /p PHONE [/addr ADDRESS]`
+**Format:** `add-customer /id CUSTOMER_ID /n NAME /p PHONE [/address ADDRESS] [/allergy ALLERGY1,ALLERGY2,...]`
 
 **Mandatory Parameters:**
 * `/id CUSTOMER_ID`: A unique identifier for the customer (e.g., `C001`).
@@ -446,11 +458,14 @@ Registers a new customer into the pharmacy's database.
 * `/p PHONE`: The customer's contact number.
 
 **Optional Parameters:**
-* `/addr ADDRESS`: The customer's residential or mailing address.
+* `/address ADDRESS`: The customer's residential or mailing address.
+* `/allergy ALLERGY1,ALLERGY2,...`: A comma-separated list of known allergens (e.g. `penicillin,aspirin`). Stored in lowercase and checked against medication names during dispensing.
 
 **Examples:**
 * `add-customer /id C001 /n John Doe /p 98765432`
-* `add-customer /id C002 /n Jane Smith /p 91234567 /a 123 Clementi Road, #04-56`
+* `add-customer /id C002 /n Jane Smith /p 91234567 /address 123 Clementi Road, #04-56`
+* `add-customer /id C003 /n Alice Tan /p 91234567 /allergy penicillin,aspirin`
+* `add-customer /id C004 /n Bob Lim /p 87654321 /address 10 Orchard Road /allergy sulfonamide`
 
 **Example Output:**
 
@@ -571,6 +586,7 @@ Customer ID:         C001
 Name:                John Tan
 Phone:               99887766
 Address:             10 Orchard Road
+Allergies:           penicillin, aspirin
 ----------------------------------------
 DISPENSING HISTORY
 ----------------------------------------
@@ -588,6 +604,7 @@ Customer ID:         C001
 Name:                John Tan
 Phone:               99887766
 Address:             10 Orchard Road
+Allergies:           None
 ----------------------------------------
 DISPENSING HISTORY
 ----------------------------------------
@@ -601,15 +618,17 @@ No medications dispensed yet.
 
 Updates one or more fields of an existing customer record. Only the fields you provide are changed; all others remain unchanged.
 
-Format: `update-customer INDEX [/n NAME] [/p PHONE] [/a ADDRESS]`
+Format: `update-customer INDEX [/n NAME] [/p PHONE] [/address ADDRESS] [/allergy ALLERGY1,ALLERGY2,...]`
 
-- At least one of `/n`, `/p`, or `/a` must be provided.
+- At least one of `/n`, `/p`, `/address`, or `/allergy` must be provided.
 - `INDEX` is the 1-based position of the customer as shown in `list-customers`.
+- `/allergy` replaces the customer's entire allergy list with the new values provided.
 
 Examples:
 - `update-customer 1 /n Alice Tan` — updates name only
-- `update-customer 2 /p 81234567 /a 99 Clementi Ave` — updates phone and address
-- `update-customer 1 /n Bob /p 98765432 /a 5 Bukit Timah Road` — updates all three fields
+- `update-customer 2 /p 81234567 /address 99 Clementi Ave` — updates phone and address
+- `update-customer 1 /allergy penicillin,ibuprofen` — sets allergies to penicillin and ibuprofen
+- `update-customer 1 /n Bob /p 98765432 /address 5 Bukit Timah Road` — updates name, phone, and address
 
 Expected output:
 ```
@@ -750,11 +769,11 @@ A: PharmaTracker will display an error message and leave the inventory or custom
 | Check low stock     | `lowstock [/threshold NUMBER]` |
 | Print label         | `label INDEX` |
 | Daily dispense log  | `dispenselog [/date YYYY-MM-DD]` |
-| Add customer        | `add-customer /id ID /n NAME /p PHONE /addr ADDRESS` |
+| Add customer        | `add-customer /id ID /n NAME /p PHONE [/address ADDRESS] [/allergy ALLERGY,...]` |
 | List customers      | `list-customers` |
 | Find customer       | `find-customer KEYWORD` |
 | View customer       | `view-customer INDEX` |
-| Update customer     | `update-customer INDEX [/n NAME] [/p PHONE] [/a ADDRESS]` |
+| Update customer     | `update-customer INDEX [/n NAME] [/p PHONE] [/address ADDRESS] [/allergy ALLERGY,...]` |
 | Delete customer     | `delete-customer INDEX`     |
 | Register            | `register USERNAME /p PASSWORD` |
 | Login               | `login USERNAME /p PASSWORD` |
