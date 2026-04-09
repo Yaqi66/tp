@@ -224,9 +224,9 @@ update INDEX [/n NAME] [/d DOSAGE] [/q QUANTITY] [/e EXPIRY] [/t TAG] [/df DOSAG
 ### How It Works
 
 1. The user enters an update command, e.g., `update 1 /q 50 /t Urgent`.
-2. `PharmaTracker.run()` reads the input and passes the raw string to `Parser.parse()`.
-3. `Parser.parse()` identifies the command word `update`.
-4. The parser isolates the target index and extracts optional flags (e.g., `/n`, `/q`, `/e`) using utility methods like `extractOptionalFlag()` and `extractOptionalQuantity()`. These methods return the updated values or `null` if a flag is absent.
+2. `PharmaTracker.run()` reads the input and passes the raw string to `PharmaTrackerParser.parse()`.
+3. `PharmaTrackerParser.parse()` identifies the command word `update` and delegates the remaining arguments string to `UpdateCommandParser.parse()`.
+4. `UpdateCommandParser` isolates the target index and extracts the optional flags using utility methods like `ParserUtil.extractOptionalFlag()`, `MedicationParserUtil.extractOptionalQuantity()`, and `MedicationParserUtil.extractWarnings()`. These methods return the updated values, or null (and empty lists for warnings) if a flag is absent.
 5. An `UpdateCommand` object is instantiated with the index and the extracted fields. Unspecified fields are passed as `null`.
 6. `PharmaTracker.run()` calls `UpdateCommand.execute()`, which validates the target index against the current size of the inventory. If invalid, an error message is printed and the command returns early.
 7. For a valid index, the corresponding `Medication` object is retrieved from the `Inventory`.

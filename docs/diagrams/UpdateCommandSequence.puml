@@ -1,48 +1,90 @@
 @startuml
+skinparam ArrowFontStyle plain
+skinparam maxMessageSize 100
+
 actor User
 participant ":PharmaTracker" as PharmaTracker
-participant ":Parser" as Parser
-participant "u:UpdateCommand" as UpdateCommand
-participant ":Inventory" as Inventory
-participant "med:Medication" as Medication
 participant ":Ui" as Ui
+participant ":PharmaTrackerParser" as PTP
+participant "parser:UpdateCommandParser" as UpdateParser
+participant ":MedicationParserUtil" as MedParserUtil
+participant "u:UpdateCommand" as UpdateCommand
+participant "inv:Inventory" as Inventory
+participant "med:Medication" as Medication
 
-User -> PharmaTracker : update 1 /q 50
+User -> PharmaTracker : "update 1 /q 50"
 activate PharmaTracker
 
-PharmaTracker -> Parser : parse("update 1 /q 50")
-activate Parser
+PharmaTracker -> Ui : readCommand()
+activate Ui
+Ui --> PharmaTracker : fullCommand
+deactivate Ui
 
-Parser -> Parser : extractOptionalQuantity()
-activate Parser
-return quantity
+PharmaTracker -> PTP : parse(fullCommand)
+activate PTP
+
+create UpdateParser
+PTP -> UpdateParser : new UpdateCommandParser()
+activate UpdateParser
+UpdateParser --> PTP : parser
+deactivate UpdateParser
+
+PTP -> UpdateParser : parse(description)
+activate UpdateParser
+
+UpdateParser -> MedParserUtil : extractOptionalQuantity(description)
+activate MedParserUtil
+MedParserUtil --> UpdateParser : quantity
+deactivate MedParserUtil
+
+note right of UpdateParser
+  Other optional flags are extracted
+  using ParserUtil.extractOptionalFlag()
+  and MedicationParserUtil.extractWarnings()
+end note
 
 create UpdateCommand
-Parser -> UpdateCommand : new UpdateCommand(...)
+UpdateParser -> UpdateCommand : new UpdateCommand(1, null, null, 50, ...)
 activate UpdateCommand
-return u
+UpdateCommand --> UpdateParser : u
+deactivate UpdateCommand
 
-return u
+UpdateParser --> PTP : u
+deactivate UpdateParser
 
-PharmaTracker -> UpdateCommand : execute(inventory, ui, customerList)
+PTP --> PharmaTracker : u
+deactivate PTP
+
+PharmaTracker -> UpdateCommand : execute(inv, ui, customerList)
 activate UpdateCommand
 
 UpdateCommand -> Inventory : getMedication(0)
 activate Inventory
-return med
+Inventory --> UpdateCommand : med
+deactivate Inventory
 
-opt quantity != null
+opt if quantity != null
     UpdateCommand -> Medication : setQuantity(50)
     activate Medication
-    return
+    Medication --> UpdateCommand
+    deactivate Medication
 end
+
+note right of UpdateCommand
+  Other non-null fields are updated
+  via their respective setters and added
+  to the 'changes' list.
+end note
 
 UpdateCommand -> Ui : printUpdatedMedicationMessage(med, changes)
 activate Ui
-return
+Ui --> UpdateCommand
+deactivate Ui
 
-return
+UpdateCommand --> PharmaTracker
+deactivate UpdateCommand
+UpdateCommand -[hidden]-> UpdateParser
+destroy UpdateCommand
 
-PharmaTracker --> User : displays output
 deactivate PharmaTracker
 @enduml
