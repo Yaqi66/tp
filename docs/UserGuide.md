@@ -223,6 +223,7 @@ history. If `/c CUSTOMER_INDEX` is omitted, the command behaves exactly as befor
 **Format**: `dispense INDEX /q QUANTITY [/c CUSTOMER_INDEX]`
 
 - Dispensing fails if the requested quantity exceeds the current stock.
+- Dispensing is blocked for expired medications. A warning is shown and stock remains unchanged.
 - `/c CUSTOMER_INDEX` is optional. If omitted, no customer record is updated.
 - If `/c CUSTOMER_INDEX` is provided but out of range, an error is shown and
   stock remains unchanged.
@@ -231,7 +232,7 @@ history. If `/c CUSTOMER_INDEX` is omitted, the command behaves exactly as befor
 
 **Example — no customer linked:**
 
-`dispense 2 q/10`
+`dispense 2 /q 10`
 
 ```
 Dispensing successfully!
@@ -242,7 +243,7 @@ Updated Stock: 40 units
 
 **Example — linked to customer:**
 
-`dispense 1 q/20 /c 1`
+`dispense 1 /q 20 /c 1`
 
 ```
 Dispensing successfully!
@@ -254,12 +255,20 @@ Recorded for customer: [C001] John Tan.
 
 **Example — allergy conflict detected:**
 
-`dispense 1 q/5 /c 1` *(where customer C001 is allergic to penicillin and medication 1 is Penicillin V)*
+`dispense 1 /q 5 /c 1` *(where customer C001 is allergic to penicillin and medication 1 is Penicillin V)*
 
 ```
 WARNING: Allergy conflict detected!
 Customer "Alice Tan" has a recorded allergy to "penicillin".
 Dispense aborted. Please verify with a pharmacist before proceeding.
+```
+
+**Example — expired medication blocked:**
+
+`dispense 3 /q 10`
+
+```
+Cannot dispense expired medication: Amoxicillin (Expired on 2024-10-01).
 ```
 
 ---

@@ -26,7 +26,7 @@ Extended the existing `dispense` command with an optional `/c CUSTOMER_INDEX` fl
 **Technical Implementation:**
 - Added an overloaded constructor to `DispenseCommand` using a sentinel value (`NO_CUSTOMER = -1`) to distinguish linked and unlinked dispenses without nullable primitives or autoboxing overhead.
 - Implemented a pre-decrement validation sequence: medication index → stock sufficiency → customer index. This ordering ensures no state is modified if any validation fails, preserving atomicity between the stock update and the customer history write.
-- Updated `Parser` to detect and extract the optional `c/` flag.
+- Updated `Parser` to detect and extract the optional `/c` flag.
 - Wrote 4 new JUnit tests covering customer linking, confirmation output, invalid customer index rollback, and the no-customer baseline (10 tests total, all passing).
 
 #### 2. List Inventory (`list`)
@@ -58,7 +58,7 @@ Implemented an additive restock command that tops up an existing medication's st
 | `list` command | Format, descriptive list of fields (name, dosage, quantity, expiry), and example output with low-stock indicators |
 | `listcustomers` command | Format, both examples (with and without customers), and expected output blocks |
 | `restock` command | Format, both examples, and expected output blocks |
-| `dispense` command | Extended format with optional `c/` flag, both examples (with and without customer linking), expected output blocks, and error behaviour description |
+| `dispense` command | Extended format with optional `/c` flag, both examples (with and without customer linking), expected output blocks, and error behaviour description |
 | Command Summary table | Updated with all implemented commands |
 
 ---
@@ -83,7 +83,7 @@ Implemented an additive restock command that tops up an existing medication's st
 ### Contributions to Team-Based Tasks
 
 - Maintained `DispenseCommand.java` as the feature evolved across multiple iterations, keeping Javadoc consistent with team conventions.
-- Ensured backward compatibility of the `dispense` command so existing behaviour and existing tests were unaffected by the new `c/` flag.
+- Ensured backward compatibility of the `dispense` command so existing behaviour and existing tests were unaffected by the new `/c` flag.
 
 ### Review / Mentoring Contributions
 
@@ -299,7 +299,7 @@ Reduces the stock of a medication by the specified quantity. Optionally links th
 
 **Example without customer linking:**
 
-Command: `dispense 2 q/10`
+Command: `dispense 2 /q 10`
 
 ```text
 Dispensing successfully!
@@ -310,7 +310,7 @@ Updated Stock: 40 units
 
 **Example with customer linking:**
 
-Command: `dispense 1 q/20 /c 1`
+Command: `dispense 1 /q 20 /c 1`
 
 ```text
 Dispensing successfully!
