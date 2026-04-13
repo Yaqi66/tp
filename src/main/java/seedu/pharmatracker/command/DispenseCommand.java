@@ -2,6 +2,7 @@ package seedu.pharmatracker.command;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ public class DispenseCommand extends Command {
 
     private static final int NO_CUSTOMER = -1;
     private static final int MIN_QUANTITY = 1;
+    private static final DateTimeFormatter HISTORY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private static final Logger logger = Logger.getLogger(DispenseCommand.class.getName());
 
@@ -185,7 +187,9 @@ public class DispenseCommand extends Command {
         String dosage = (med.getDosage() != null && !med.getDosage().isEmpty())
                 ? med.getDosage()
                 : "N/A";
-        String record = med.getName() + " | " + dosage + " | Qty: " + quantity;
+        String record = med.getName() + " | " + dosage
+            + " | Qty dispensed: " + quantity
+            + " | Date: " + LocalDate.now().format(HISTORY_DATE_FORMAT);
         customer.addDispensingHistory(record);
 
         logger.log(Level.INFO, "Linked dispense to customer: {0}", customer.getName());

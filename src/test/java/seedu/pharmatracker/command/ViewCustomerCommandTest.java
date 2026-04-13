@@ -12,6 +12,8 @@ import seedu.pharmatracker.ui.Ui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -249,6 +251,8 @@ public class ViewCustomerCommandTest {
         new ViewCustomerCommand(1).execute(inventory, new Ui(), customerList);
         String output = out.toString();
         assertTrue(output.contains("Paracetamol"));
+        assertTrue(output.contains("Qty dispensed: 10"));
+        assertTrue(output.contains("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
     }
 
     /**
