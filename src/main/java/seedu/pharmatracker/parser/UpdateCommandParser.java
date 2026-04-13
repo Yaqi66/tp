@@ -31,6 +31,10 @@ public class UpdateCommandParser implements Parser<UpdateCommand> {
             int updateIndex = Integer.parseInt(updateParts[0]);
             String updateArgs = (updateParts.length > 1) ? updateParts[1] : "";
 
+            if (updateArgs.trim().isEmpty()) {
+                throw new PharmaTrackerException("No fields provided to update!");
+            }
+
             String uName = ParserUtil.extractOptionalFlag(updateArgs, MedicationParserUtil.FLAG_NAME);
             String uDosage = ParserUtil.extractOptionalFlag(updateArgs, MedicationParserUtil.FLAG_DOSAGE);
             Integer uQuantity = MedicationParserUtil.extractOptionalQuantity(updateArgs);
