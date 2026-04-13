@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
+import seedu.pharmatracker.exceptions.PharmaTrackerException;
 import seedu.pharmatracker.ui.Ui;
 import seedu.pharmatracker.customer.CustomerList;
 
@@ -79,7 +80,7 @@ public class AddCommand extends Command {
      * @param customerList The list of registered customers.
      */
     @Override
-    public void execute(Inventory inventory, Ui ui, CustomerList customerList) {
+    public void execute(Inventory inventory, Ui ui, CustomerList customerList) throws PharmaTrackerException {
         assert inventory != null : "Inventory cannot be null in AddCommand execution.";
         assert ui != null : "Ui cannot be null in AddCommand execution.";
         logger.log(Level.INFO, "Starting execution of AddCommand for medication: " + name);
@@ -97,9 +98,8 @@ public class AddCommand extends Command {
         }
 
         if (inventory.containsMedication(name, dosage, quantity, expiryDate)) {
-            ui.printMessage("Failed to add medication.\nUse the update command to update the medication as required.");
-            logger.log(Level.WARNING, "Attempted to add duplicate medication entry");
-            return;
+            throw new PharmaTrackerException("Failed to add medication.\n" +
+                    "Use the update command to update the medication as required.");
         }
 
         inventory.addMedication(med);

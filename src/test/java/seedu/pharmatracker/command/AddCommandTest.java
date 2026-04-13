@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
+import seedu.pharmatracker.exceptions.PharmaTrackerException;
 import seedu.pharmatracker.ui.Ui;
 import seedu.pharmatracker.customer.CustomerList;
 
@@ -25,7 +26,7 @@ public class AddCommandTest {
      * default to empty strings or empty lists.
      */
     @Test
-    public void execute_mandatoryFieldsOnly_addsToInventory() {
+    public void execute_mandatoryFieldsOnly_addsToInventory() throws PharmaTrackerException {
         Inventory inventory = new Inventory();
         Ui ui = new Ui();
         CustomerList customerList = new CustomerList();
@@ -57,7 +58,7 @@ public class AddCommandTest {
      * are populated correctly.
      */
     @Test
-    public void execute_allFieldsPresent_addsSuccessfully() {
+    public void execute_allFieldsPresent_addsSuccessfully() throws PharmaTrackerException {
         Inventory inventory = new Inventory();
         Ui ui = new Ui();
         CustomerList customerList = new CustomerList();
@@ -95,7 +96,7 @@ public class AddCommandTest {
      * multiple medications to the {@code Inventory} without overwriting previous entries.
      */
     @Test
-    public void execute_multipleAddCommands_appendsToInventory() {
+    public void execute_multipleAddCommands_appendsToInventory() throws PharmaTrackerException {
         Inventory inventory = getInventory();
         assertEquals(2, inventory.getMedications().size());
 
@@ -108,7 +109,7 @@ public class AddCommandTest {
      * Helper method to initialize an {@code Inventory}l and execute two {@code AddCommand}s.
      * @return An {@code Inventory} populated with the two sample medications.
      */
-    private static Inventory getInventory() {
+    private static Inventory getInventory() throws PharmaTrackerException {
         Inventory inventory = new Inventory();
         Ui ui = new Ui();
         CustomerList customerList = new CustomerList();
