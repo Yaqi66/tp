@@ -126,7 +126,7 @@ public class Inventory {
      * @param expiryDate The expiration date in YYYY-MM-DD format.
      * @return true if the medication already exists, false otherwise.
      */
-    public boolean containsMedication(String name, String dosage, String expiryDate) {
+    public boolean containsMedication(String name, String dosage, int quantity, String expiryDate) {
         if (name == null || dosage == null || expiryDate == null) {
             return false;
         }
@@ -134,6 +134,7 @@ public class Inventory {
         for (Medication med : medications) {
             if (name.equalsIgnoreCase(med.getName()) &&
                     med.getDosage().equalsIgnoreCase(dosage) &&
+                    med.getQuantity() == quantity &&
                     med.getExpiryDate().equalsIgnoreCase(expiryDate)) {
                 return true;
             }
