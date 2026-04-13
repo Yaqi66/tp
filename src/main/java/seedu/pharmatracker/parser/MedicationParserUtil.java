@@ -16,7 +16,7 @@ import seedu.pharmatracker.exceptions.PharmaTrackerException;
  */
 public class MedicationParserUtil {
     public static final String FLAG_NAME = "/n";
-    public static final String FLAG_DOSAGE = "/d";
+    public static final String FLAG_DOSAGE = "/d ";
     public static final String FLAG_QUANTITY = "/q";
     public static final String FLAG_EXPIRY_DATE = "/e";
     public static final String FLAG_TAG = "/t";
@@ -71,7 +71,7 @@ public class MedicationParserUtil {
             throw new PharmaTrackerException("Invalid format! Please ensure you include '/d' followed by '/q'.");
         }
 
-        String dosage = description.substring(dosageIndex + 2, quantityIndex).trim();
+        String dosage = description.substring(dosageIndex + FLAG_DOSAGE.length(), quantityIndex).trim();
         if (dosage.isEmpty()) {
             throw new PharmaTrackerException("Dosage cannot be empty!");
         }

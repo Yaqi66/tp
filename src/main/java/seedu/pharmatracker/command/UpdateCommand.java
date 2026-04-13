@@ -153,8 +153,8 @@ public class UpdateCommand extends Command {
             changes.add("Max Daily Dose updated to " + maxDailyDose);
         }
 
-        if (warnings != null && !warnings.isEmpty()) {
-            med.getWarnings().clear(); // Clear old warnings and replace with new ones
+        if (warnings != null) {
+            med.getWarnings().clear();
             for (String warning : warnings) {
                 med.addWarning(warning);
             }

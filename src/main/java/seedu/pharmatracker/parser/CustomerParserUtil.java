@@ -133,7 +133,7 @@ public class CustomerParserUtil {
 
         for (String token : raw.split(",")) {
             String trimmed = token.trim().toLowerCase();
-            if (!trimmed.isEmpty()) {
+            if (!trimmed.isEmpty() && !allergies.contains(trimmed)) {
                 allergies.add(trimmed);
             }
         }

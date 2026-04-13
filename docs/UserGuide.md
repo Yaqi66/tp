@@ -323,13 +323,25 @@ Edits the details of an existing medication in the inventory.
 * Existing values will be completely overwritten by the newly provided values.
 
 **Examples:**
-* `update 1 /e 31/12/2027`: Updates the expiry date of the 1st medication in the list to `31/12/2027`. All other details remain unchanged.
-* `update 2 /n Amoxicillin Forte /d 500mg`: Updates both the name and the dosage of the 2nd medication in the list.
+* `update 1 /e 31/12/2027`: Updates the expiry date of the 1st medication in the list to
+  `31/12/2027`. All other details remain unchanged.
+* `update 2 /n Amoxicillin Forte /d 500mg`: Updates both the name and the dosage of the
+  2nd medication in the list.
+* `update 1 /warn`: Clears all warnings from the 1st medication. All other fields remain
+  unchanged.
+* `update 1 /d 1000mg /df Capsule`: Updates both the dosage and dosage form. Note that `/d`
+  and `/df` can be used together without conflict.
 
 **Notes:**
 * **Updating quantities:** While you *can* use this command to overwrite the quantity (`/q`), it is highly recommended to use the `restock` and `dispense` commands for everyday inventory management, as they safely add to or subtract from the current stock.
-* **Replacing lists (Warnings/Tags):** When updating fields that can have multiple values (like `/warn` or `/t`), the existing values are **completely replaced** by the new ones.
-  * *Example:* If a medication has the warnings "Drowsiness" and "Take with food", typing `update 1 /warn Avoid alcohol` will remove the first two warnings and leave *only* "Avoid alcohol".
+* **Replacing lists (Warnings/Tags):** When updating fields that can have multiple values
+  (like `/warn` or `/t`), the existing values are **completely replaced** by the new ones.
+  * *Example:* If a medication has the warnings "Drowsiness" and "Take with food", typing
+    `update 1 /warn Avoid alcohol` will remove the first two warnings and leave *only*
+    "Avoid alcohol".
+* **Clearing warnings:** To remove all warnings from a medication, provide the `/warn` flag
+  with no value (e.g. `update 1 /warn`). This clears the entire warnings list. Other fields
+  are unaffected.
 
 **Example Output:**
 

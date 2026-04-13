@@ -47,7 +47,9 @@ public class UpdateCommandParser implements Parser<UpdateCommand> {
             String uRoute = ParserUtil.extractOptionalFlag(updateArgs, MedicationParserUtil.FLAG_ROUTE);
             String uMaxDailyDose = ParserUtil.extractOptionalFlag(updateArgs, MedicationParserUtil.FLAG_MAX_DOSAGE);
 
-            ArrayList<String> uWarnings = MedicationParserUtil.extractWarnings(updateArgs);
+            ArrayList<String> uWarnings = updateArgs.contains(MedicationParserUtil.FLAG_WARNINGS)
+                    ? MedicationParserUtil.extractWarnings(updateArgs)
+                    : null;
 
             return new UpdateCommand(updateIndex, uName, uDosage, uQuantity, uExpiry, uTag,
                     uDosageForm, uManufacturer, uDirections, uFrequency, uRoute, uMaxDailyDose, uWarnings);

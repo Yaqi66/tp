@@ -150,7 +150,12 @@ The following steps describe how an add command is processed.
 1. The user enters `add /n Paracetamol /d 500mg /q 100 /e 2026-12-31 /t Painkiller /df Tablet /warn May cause drowsiness`.
 2. `PharmaTracker.run()` reads the user input and passes the raw string to `PharmaTrackerParser.parse()`.
 3. `PharmaTrackerParser.parse()` identifies the command word `add` and delegates the remaining description string to `AddCommandParser.parse()`.
-4. `AddCommandParser` first uses specific extraction methods from `MedicationParserUtil` (`extractName()`, `extractDosage()`, `extractQuantity()`, and `extractExpiryDate()`). These methods validate that the mandatory flags (`/n`, `/d`, `/q`, `/e`) are present, properly formatted, and in the correct relative order.
+4. `AddCommandParser` first uses specific extraction methods from `MedicationParserUtil`
+   (`extractName()`, `extractDosage()`, `extractQuantity()`, and `extractExpiryDate()`). These
+   methods validate that the mandatory flags (`/n`, `/d `, `/q`, `/e`) are present, properly
+   formatted, and in the correct relative order. Note that `FLAG_DOSAGE` is defined as `"/d "`
+   (with a trailing space) to prevent a prefix collision with `FLAG_DOSAGE_FORM` (`/df`),
+   where a plain `indexOf("/d")` would falsely match inside `/df`.
 5. Next, the parser extracts the optional attributes (Tag, Dosage Form, Manufacturer, Directions, Frequency, Route, Max Daily Dose) using the `ParserUtil.extractFlag()` method. To allow users to input optional flags in any order, `extractFlag()` relies on a helper method called `findNextFlagIndex()`. This helper scans the remainder of the input string against a predefined array of `ALL_FLAGS` to dynamically determine where the current flag's value ends and where the next one begins.
 6. For warnings, the parser uses `MedicationParserUtil.extractWarnings()`, which loops through the input string to locate all occurrences of the `/warn` flag, compiling them into an `ArrayList<String>`.
 7. All extracted values (both compulsory and optional) are passed into the `AddCommand` constructor to create a new `AddCommand` object.
@@ -281,7 +286,13 @@ update INDEX [/n NAME] [/d DOSAGE] [/q QUANTITY] [/e EXPIRY] [/t TAG] [/df DOSAG
 1. The user enters an update command, e.g., `update 1 /q 50 /t Urgent`.
 2. `PharmaTracker.run()` reads the input and passes the raw string to `PharmaTrackerParser.parse()`.
 3. `PharmaTrackerParser.parse()` identifies the command word `update` and delegates the remaining arguments string to `UpdateCommandParser.parse()`.
-4. `UpdateCommandParser` isolates the target index and extracts the optional flags using utility methods like `ParserUtil.extractOptionalFlag()`, `MedicationParserUtil.extractOptionalQuantity()`, and `MedicationParserUtil.extractWarnings()`. These methods return the updated values, or null (and empty lists for warnings) if a flag is absent.
+4. `UpdateCommandParser` isolates the target index and extracts the optional flags using utility
+   methods like `ParserUtil.extractOptionalFlag()`, `MedicationParserUtil.extractOptionalQuantity()`,
+   and `MedicationParserUtil.extractWarnings()`. These methods return the updated values, or `null`
+   if a flag is absent. For warnings specifically, three states are distinguished: `null` means the
+   `/warn` flag was not provided (leave unchanged), an empty list means `/warn` was provided with
+   no value (clear all warnings), and a non-empty list means replace existing warnings with the
+   new values.
 5. An `UpdateCommand` object is instantiated with the index and the extracted fields. Unspecified fields are passed as `null`.
 6. `PharmaTracker.run()` calls `UpdateCommand.execute()`, which validates the target index against the current size of the inventory. If invalid, an error message is printed and the command returns early.
 7. For a valid index, the corresponding `Medication` object is retrieved from the `Inventory`.
@@ -535,6 +546,9 @@ The feature spans three layers:
 - `FLAG_ADDRESS` was renamed from `/a` to `/addr` to eliminate an ambiguity: `/a` is a
   prefix of `/allergy`, causing `indexOf("/a")` to falsely match inside `/allergy`. Using
   `/addr` removes the collision entirely.
+- `FLAG_DOSAGE` is defined as `"/d "` (with a trailing space) rather than `"/d"` to prevent
+  a similar collision with `FLAG_DOSAGE_FORM` (`/df`), where `indexOf("/d")` would falsely
+  match inside `/df`.
 
 **Command (`DispenseCommand.java`)**
 - The allergy check is performed after all index and stock validations, but before
@@ -550,6 +564,7 @@ The feature spans three layers:
 | `/a` renamed to `/addr` | Flag rename | Eliminates prefix collision with `/allergy` without requiring fragile character-lookahead logic |
 | Allergy check aborts silently (no partial execution) | Hard abort | Partial execution — e.g. stock decremented but record not written — would leave the system in an inconsistent state |
 | `setAllergies()` replaces rather than appends | Full replacement | Supports corrections; staff can re-declare the full list to remove a previously recorded allergen |
+| `/d` defined as `"/d "` with trailing space | Flag definition | Prevents prefix collision with `/df`; `indexOf("/d")` would otherwise match inside `/df`, corrupting dosage extraction when both flags appear in the same command |
 
 ---
 
