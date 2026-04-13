@@ -2,6 +2,7 @@ package seedu.pharmatracker.parser;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,5 +55,11 @@ public class PharmaTrackerParserTest {
     @Test
     public void parser_invalidRegisterFormat_throwsException() {
         assertThrows(PharmaTrackerException.class, () -> PharmaTrackerParser.parse("register alice"));
+    }
+
+    @Test
+    public void parser_dispenseNegativeCustomerIndex_returnsNull() throws PharmaTrackerException {
+        Command c = PharmaTrackerParser.parse("dispense 1 /q 10 /c -1");
+        assertNull(c);
     }
 }
