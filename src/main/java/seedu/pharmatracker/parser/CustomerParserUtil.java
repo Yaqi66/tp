@@ -169,7 +169,7 @@ public class CustomerParserUtil {
 
     /**
      * Extracts an optional customer flag for update-customer, returning {@code null} if absent.
-     * Uses customer-specific flag boundaries (/n, /p, /a).
+     * Uses customer-specific flag boundaries (/n, /p, /addr).
      *
      * @param description The raw argument string (without the command word and index).
      * @param flag        The flag to look for.
