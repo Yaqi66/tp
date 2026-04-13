@@ -3,6 +3,7 @@ package seedu.pharmatracker.parser;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 
 import seedu.pharmatracker.exceptions.PharmaTrackerException;
@@ -135,6 +136,16 @@ public class MedicationParserUtil {
             throw new PharmaTrackerException("Invalid date format! Supported formats: yyyy-MM-dd, d/M/yyyy, d-M-yyyy");
         }
 
+        LocalDate today = LocalDate.now();
+
+        if (parsedDate.isBefore(today)) {
+            throw new PharmaTrackerException("Invalid expiry date! Expired medications cannot be added.");
+        }
+
+        if (parsedDate.isAfter(today.plusYears(10))) {
+            throw new PharmaTrackerException("Invalid expiry date! Expiry dates at least 10 years away are not valid.");
+        }
+
         return parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
@@ -195,9 +206,9 @@ public class MedicationParserUtil {
      */
     private static LocalDate parseDate(String dateString) {
         DateTimeFormatter[] formatters = {
-                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-                DateTimeFormatter.ofPattern("d/M/yyyy"),
-                DateTimeFormatter.ofPattern("d-M-yyyy")
+                DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT),
+                DateTimeFormatter.ofPattern("d/M/uuuu").withResolverStyle(ResolverStyle.STRICT),
+                DateTimeFormatter.ofPattern("d-M-uuuu").withResolverStyle(ResolverStyle.STRICT)
         };
 
         for (DateTimeFormatter formatter : formatters) {
