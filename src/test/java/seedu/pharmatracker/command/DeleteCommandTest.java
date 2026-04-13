@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import seedu.pharmatracker.data.Inventory;
 import seedu.pharmatracker.data.Medication;
+import seedu.pharmatracker.exceptions.PharmaTrackerException;
 import seedu.pharmatracker.ui.Ui;
 import seedu.pharmatracker.customer.CustomerList;
 
@@ -22,7 +23,7 @@ public class DeleteCommandTest {
      * medication is the one originally at the second position.
      */
     @Test
-    public void execute_validFirstIndex_deletesCorrectMedication() {
+    public void execute_validFirstIndex_deletesCorrectMedication() throws PharmaTrackerException {
         Inventory inventory = new Inventory();
         Ui ui = new Ui();
         CustomerList customerList = new CustomerList();
@@ -48,7 +49,7 @@ public class DeleteCommandTest {
      * medication remains completely unaffected.
      */
     @Test
-    public void execute_validLastIndex_deletesCorrectMedication() {
+    public void execute_validLastIndex_deletesCorrectMedication() throws PharmaTrackerException {
 
         Inventory inventory = new Inventory();
         Ui ui = new Ui();

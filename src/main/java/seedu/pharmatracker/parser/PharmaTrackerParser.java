@@ -47,6 +47,11 @@ public class PharmaTrackerParser {
      * @throws PharmaTrackerException If the command word is unknown, or if the arguments are invalid / missing.
      */
     public static Command parse(String userInput) throws PharmaTrackerException {
+
+        if (userInput.contains("|") || userInput.contains(";")) {
+            throw new PharmaTrackerException("Invalid input! The characters '|' and ';' are not valid.");
+        }
+
         String[] inputParts = userInput.trim().split("\\s+", 2);
         String commandWord = inputParts[0].toLowerCase();
         String description = (inputParts.length > 1) ? inputParts[1] : "";

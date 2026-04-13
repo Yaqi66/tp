@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import seedu.pharmatracker.customer.Customer;
 import seedu.pharmatracker.customer.CustomerList;
 import seedu.pharmatracker.data.Inventory;
+import seedu.pharmatracker.exceptions.PharmaTrackerException;
 import seedu.pharmatracker.ui.Ui;
 
 public class DeleteCustomerCommandTest {
@@ -34,7 +35,7 @@ public class DeleteCustomerCommandTest {
     }
 
     @Test
-    void execute_validIndex_customerDeleted() {
+    void execute_validIndex_customerDeleted() throws PharmaTrackerException {
         assertEquals(1, customerList.getCustomerCount());
 
         DeleteCustomerCommand command = new DeleteCustomerCommand("1");
@@ -45,11 +46,15 @@ public class DeleteCustomerCommandTest {
     }
 
     @Test
-    void execute_nonNumericIndex_handlesExceptionGracefully() {
+    void execute_nonNumericIndex_throwsPharmaTrackerException() {
         DeleteCustomerCommand command = new DeleteCustomerCommand("abc");
-        assertDoesNotThrow(() -> command.execute(inventory, ui, customerList));
-    }
 
+        PharmaTrackerException thrown = assertThrows(PharmaTrackerException.class,
+                () -> command.execute(inventory, ui, customerList));
+
+        assertEquals("Invalid format! Please enter a valid number for the customer index.",
+                thrown.getMessage());
+    }
 
     @Test
     void execute_nullCustomerList_throwsAssertionError() {
