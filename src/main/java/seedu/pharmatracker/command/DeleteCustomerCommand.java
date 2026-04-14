@@ -66,7 +66,8 @@ public class DeleteCustomerCommand extends Command {
                 throw new PharmaTrackerException("Invalid index. Please enter an integer between 1 and "
                         + customerCount + ".");
             } else {
-                throw new PharmaTrackerException("Invalid format! Please enter a valid integer for the customer index.");
+                throw new PharmaTrackerException("Invalid format! " +
+                        "Please enter a valid integer for the customer index.");
             }
         }
     }

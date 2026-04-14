@@ -143,7 +143,7 @@ public class MedicationParserUtil {
 
     /**
      * Extracts an optional expiry date for commands that modify existing entries.
-     * * @param description The raw string containing command arguments.
+     * @param description The raw string containing command arguments.
      * @return The extracted and formatted date string, or null if the flag is not present.
      * @throws PharmaTrackerException If the format is invalid or the date violates business rules.
      */
